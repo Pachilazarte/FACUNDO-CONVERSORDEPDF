@@ -24,34 +24,23 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .o2{width:450px;height:450px;background:rgba(157,78,221,.07);bottom:0;left:-150px;animation:fo2 14s ease-in-out infinite;}
 @keyframes fo1{0%,100%{transform:translateY(0)}50%{transform:translateY(-25px)}}
 @keyframes fo2{0%,100%{transform:translateY(0)}50%{transform:translateY(20px)}}
-
 .wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:20px 16px 60px;}
-
-/* Header */
-.hdr{text-align:center;padding:28px 0 34px;}
 .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.07);border:1px solid var(--border);border-radius:100px;padding:5px 16px 5px 9px;margin-bottom:16px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:2.5px;}
 .pdot{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);animation:pd 1.8s ease-in-out infinite;}
 @keyframes pd{0%,100%{opacity:1}50%{opacity:.22}}
-h1{font-size:clamp(2.4rem,7.5vw,4rem);font-weight:900;letter-spacing:-1.5px;line-height:1;background:linear-gradient(135deg,#fff 0%,var(--cyan) 40%,var(--purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:9px;}
-.sub{font-size:.76rem;color:var(--dim);letter-spacing:2.5px;font-family:'Share Tech Mono',monospace;}
-
-/* Engine pills */
 .engine-strip{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:26px;flex-wrap:wrap;}
 .ep{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:5px 13px;font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:1px;}
 .ep1{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.25);color:var(--cyan);}
 .ep2{background:rgba(157,78,221,.08);border:1px solid rgba(157,78,221,.3);color:rgba(210,180,255,.9);}
 .ep3{background:rgba(57,255,122,.06);border:1px solid rgba(57,255,122,.2);color:var(--green);}
+.ep4{background:rgba(255,196,0,.06);border:1px solid rgba(255,196,0,.25);color:var(--gold);}
 .ea{color:var(--dim);font-size:.85rem;}
-
-/* Card */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:14px;backdrop-filter:blur(18px);transition:border-color .3s;}
 .card:focus-within{border-color:rgba(0,229,255,.28);}
 .ch{display:flex;align-items:center;gap:11px;margin-bottom:20px;}
 .sn{width:29px;height:29px;flex-shrink:0;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#000;}
 .ct{font-size:.92rem;font-weight:700;}
 .cs{font-size:.7rem;color:var(--dim);font-family:'Share Tech Mono',monospace;margin-top:2px;}
-
-/* Form */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 @media(max-width:460px){.fg{grid-template-columns:1fr;}}
 .fi{display:flex;flex-direction:column;gap:6px;}
@@ -62,14 +51,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 select option{background:#080f22;}
 select:focus,input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.1);background:rgba(0,229,255,.05);}
 input::placeholder{color:var(--dim);font-weight:400;}
-
-/* Preprocessing toggles */
 .prep-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
 .toggle-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,255,.04);border:1px solid var(--border);border-radius:100px;padding:5px 13px;font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--dim);cursor:pointer;transition:all .2s;user-select:none;}
 .toggle-pill.on{background:rgba(0,229,255,.1);border-color:var(--cyan);color:var(--cyan);}
 .toggle-pill .tk{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
-
-/* Upload */
 .ua{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:12px;}
 .ubtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:20px 10px;background:rgba(0,229,255,.035);border:1.5px dashed var(--border);border-radius:15px;cursor:pointer;font-family:'Exo 2',sans-serif;color:var(--text);transition:all .25s;width:100%;-webkit-appearance:none;}
 .ubtn:hover,.ubtn:active{border-color:var(--cyan);background:rgba(0,229,255,.07);transform:translateY(-2px);color:var(--cyan);}
@@ -78,16 +63,12 @@ input::placeholder{color:var(--dim);font-weight:400;}
 .ubtn .hnt{font-size:.64rem;color:var(--dim);font-family:'Share Tech Mono',monospace;}
 #fileInput,#cameraInput{display:none!important;}
 .drop-h{text-align:center;padding:6px 0 3px;font-size:.66rem;color:var(--dim);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
-
-/* Camera bar */
 .cbar{display:none;align-items:center;gap:8px;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);border-radius:11px;padding:11px 13px;margin-bottom:12px;flex-wrap:wrap;}
 .cbar.on{display:flex;}
 .cbar-t{font-size:.8rem;flex:1;min-width:100px;}
 .cbar-t strong{color:var(--cyan);}
 .btn-ns{background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;border-radius:7px;padding:8px 16px;color:#000;font-family:'Exo 2',sans-serif;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap;}
 .btn-cd{background:transparent;border:1px solid rgba(0,229,255,.3);border-radius:7px;padding:8px 13px;color:var(--dim);font-family:'Exo 2',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap;}
-
-/* Grid */
 .imgs-s{display:none;}
 .imgs-s.on{display:block;}
 .cntbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;margin-top:12px;}
@@ -104,15 +85,12 @@ input::placeholder{color:var(--dim);font-weight:400;}
 .ith:hover .rm{opacity:1;}
 .ith .pg{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.75);border-radius:3px;padding:1px 5px;font-size:9px;font-family:'Share Tech Mono',monospace;color:var(--cyan);}
 .ith .ori{position:absolute;top:3px;left:3px;background:rgba(255,196,0,.85);border-radius:3px;padding:1px 5px;font-size:8px;font-family:'Share Tech Mono',monospace;color:#000;font-weight:700;}
-/* Processing indicator on thumb */
 .ith .spin{position:absolute;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;font-size:1.3rem;}
 .ith.processing .spin{display:flex;animation:thumbPulse 1s ease-in-out infinite;}
 @keyframes thumbPulse{0%,100%{opacity:.7}50%{opacity:1}}
 .ith .ok-overlay{position:absolute;inset:0;background:rgba(57,255,122,.12);display:none;align-items:center;justify-content:center;font-size:1.4rem;}
 .ith.done .ok-overlay{display:flex;}
 .ith.done img{opacity:.7;}
-
-/* Progress */
 .prog-s{display:none;margin-bottom:14px;}
 .prog-s.on{display:block;}
 .plog{background:rgba(0,0,0,.55);border:1px solid var(--border);border-radius:11px;padding:13px 15px;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);max-height:190px;overflow-y:auto;line-height:1.95;margin-bottom:12px;}
@@ -126,8 +104,6 @@ input::placeholder{color:var(--dim);font-weight:400;}
 .bw{background:rgba(255,255,255,.05);border-radius:100px;height:5px;overflow:hidden;margin-bottom:6px;}
 .bf{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:100px;transition:width .3s ease;box-shadow:0 0 10px rgba(0,229,255,.4);width:0%;}
 .bl{font-size:.68rem;font-family:'Share Tech Mono',monospace;color:var(--dim);text-align:center;margin-bottom:14px;}
-
-/* Stats */
 .stats-box{display:none;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:11px;padding:13px 15px;margin-bottom:14px;}
 .stats-box.on{display:block;}
 .sr{display:flex;align-items:center;justify-content:space-between;font-size:.71rem;font-family:'Share Tech Mono',monospace;color:var(--dim);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);}
@@ -137,8 +113,6 @@ input::placeholder{color:var(--dim);font-weight:400;}
 .sv.mid{color:var(--gold);}
 .sv.lo{color:var(--pink);}
 .sv.def{color:var(--text);}
-
-/* CTA */
 .btn-proc{width:100%;padding:16px;border:none;border-radius:13px;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#000;font-family:'Exo 2',sans-serif;font-size:.92rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
 .btn-proc::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);opacity:0;transition:opacity .3s;}
 .btn-proc:hover::after{opacity:1;}
@@ -146,8 +120,6 @@ input::placeholder{color:var(--dim);font-weight:400;}
 .btn-proc:disabled{opacity:.32;cursor:not-allowed;transform:none;box-shadow:none;}
 .errb{background:rgba(255,45,120,.07);border:1px solid rgba(255,45,120,.3);border-radius:9px;padding:10px 14px;font-size:.76rem;color:#ff8cb0;margin-top:11px;display:none;font-family:'Share Tech Mono',monospace;line-height:1.6;}
 .errb.on{display:block;}
-
-/* Download */
 .dls{display:none;text-align:center;margin-top:6px;}
 .dls.on{display:block;}
 .sring{width:68px;height:68px;margin:0 auto 16px;background:linear-gradient(135deg,rgba(57,255,122,.14),rgba(0,229,255,.1));border:2px solid rgba(57,255,122,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;animation:rp .5s cubic-bezier(.34,1.56,.64,1);}
@@ -161,72 +133,30 @@ input::placeholder{color:var(--dim);font-weight:400;}
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 .foot{text-align:center;padding:14px;font-size:.62rem;font-family:'Share Tech Mono',monospace;color:rgba(200,240,255,.09);letter-spacing:1.5px;}
-/* --- ESTILOS DE NAVEGACIÓN --- */
-.nav-container {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 25px;
-  font-family: 'Share Tech Mono', monospace;
-  align-items: center; /* Alinea verticalmente los botones */
-}
-
-.btn-capsule {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0, 229, 255, 0.05);
-  border: 1px solid rgba(0, 229, 255, 0.2);
-  border-radius: 100px;
-  padding: 6px 16px;
-  font-size: 11px;
-  color: var(--dim);
-  text-decoration: none;
-  letter-spacing: 2px;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  height: 30px; /* Altura fija para que coincidan */
-}
-
-.btn-capsule:hover {
-  border-color: var(--cyan);
-  color: var(--cyan);
-  background: rgba(0, 229, 255, 0.1);
-}
-
-.btn-capsule.active {
-  color: var(--cyan);
-  border-color: rgba(0, 229, 255, 0.4);
-  background: rgba(0, 229, 255, 0.08);
-}
-
-.pdot-nav {
-  width: 8px;
-  height: 8px;
-  background: var(--cyan);
-  border-radius: 50%;
-  box-shadow: 0 0 10px var(--cyan);
-}
-
-
+.nav-container{display:flex;gap:10px;margin-bottom:25px;font-family:'Share Tech Mono',monospace;align-items:center;}
+.btn-capsule{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.2);border-radius:100px;padding:6px 16px;font-size:11px;color:var(--dim);text-decoration:none;letter-spacing:2px;transition:all .3s ease;text-transform:uppercase;height:30px;}
+.btn-capsule:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,.1);}
+.btn-capsule.active{color:var(--cyan);border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.08);}
+.pdot-nav{width:8px;height:8px;background:var(--cyan);border-radius:50%;box-shadow:0 0 10px var(--cyan);}
+/* EXIF badge */
+.exif-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(255,196,0,.08);border:1px solid rgba(255,196,0,.25);border-radius:4px;padding:1px 6px;font-size:8px;font-family:'Share Tech Mono',monospace;color:var(--gold);position:absolute;bottom:16px;right:3px;}
 </style>
 </head>
 <body>
 <div class="orb o1"></div>
 <div class="orb o2"></div>
-
 <div class="wrap">
   <div class="nav-container">
     <a href="generadordepdf.html" class="btn-capsule">← IR A APUNTES</a>
-    
-    <div class="btn-capsule active">
-      <div class="pdot-nav"></div> NEUROSCAN · OCR · v6
-    </div>
+    <div class="btn-capsule active"><div class="pdot-nav"></div> NEUROSCAN · OCR · v7</div>
   </div>
 
   <div class="engine-strip">
+    <div class="ep ep4">📱 EXIF Auto-rotate</div>
+    <span class="ea">→</span>
     <div class="ep ep1">🖼 Preprocesado Canvas</div>
     <span class="ea">→</span>
-    <div class="ep ep2">🔍 Tesseract spa bbox</div>
+    <div class="ep ep2">🔍 Tesseract spa</div>
     <span class="ea">→</span>
     <div class="ep ep3">📄 PDF posicional</div>
   </div>
@@ -257,25 +187,16 @@ input::placeholder{color:var(--dim);font-weight:400;}
   <div class="card" id="ucard">
     <div class="ch"><div class="sn">02</div>
       <div><div class="ct">Cargar Imágenes / Páginas</div>
-        <div class="cs">Detección horizontal · vertical automática</div></div>
+        <div class="cs">Rotación EXIF automática · detección horizontal/vertical</div></div>
     </div>
 
-    <!-- Preprocessing options -->
     <div style="margin-bottom:14px;">
       <div style="font-size:.67rem;font-family:'Share Tech Mono',monospace;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Preprocesado de imagen</div>
       <div class="prep-row">
-        <div class="toggle-pill on" id="tg-gray" onclick="togglePrep('gray')">
-          <div class="tk"></div> Escala de grises
-        </div>
-        <div class="toggle-pill on" id="tg-contrast" onclick="togglePrep('contrast')">
-          <div class="tk"></div> Boost de contraste
-        </div>
-        <div class="toggle-pill on" id="tg-sharp" onclick="togglePrep('sharp')">
-          <div class="tk"></div> Nitidez
-        </div>
-        <div class="toggle-pill" id="tg-thresh" onclick="togglePrep('thresh')">
-          <div class="tk"></div> Binarizar (B&N duro)
-        </div>
+        <div class="toggle-pill on" id="tg-gray" onclick="togglePrep('gray')"><div class="tk"></div> Escala de grises</div>
+        <div class="toggle-pill on" id="tg-contrast" onclick="togglePrep('contrast')"><div class="tk"></div> Boost de contraste</div>
+        <div class="toggle-pill on" id="tg-sharp" onclick="togglePrep('sharp')"><div class="tk"></div> Nitidez</div>
+        <div class="toggle-pill" id="tg-thresh" onclick="togglePrep('thresh')"><div class="tk"></div> Binarizar (B&N duro)</div>
       </div>
     </div>
 
@@ -322,6 +243,7 @@ input::placeholder{color:var(--dim);font-weight:400;}
         <div class="sr"><span>Palabras detectadas</span><span class="sv def" id="stW">—</span></div>
         <div class="sr"><span>Confianza promedio</span><span class="sv def" id="stC">—</span></div>
         <div class="sr"><span>Orientación</span><span class="sv def" id="stO">—</span></div>
+        <div class="sr"><span>EXIF corregidas</span><span class="sv def" id="stE">—</span></div>
         <div class="sr"><span>Motor</span><span class="sv hi">Tesseract.js v5 · spa · PSM 1</span></div>
       </div>
       <div class="bw"><div class="bf" id="bf"></div></div>
@@ -337,7 +259,7 @@ input::placeholder{color:var(--dim);font-weight:400;}
       <button class="btn-rst" onclick="resetAll()">↩ Procesar nuevas imágenes</button>
     </div>
   </div>
-  <div class="foot">NEUROSCAN v6 · 100% LOCAL · TESSERACT SPA · WORD BBOX · JSPDF</div>
+  <div class="foot">NEUROSCAN v7 · EXIF AUTO-ROTATE · 100% LOCAL · TESSERACT SPA · JSPDF</div>
 </div>
 
 <script>
@@ -349,7 +271,124 @@ var pdfBlob  = null;
 var pdfFname = '';
 var inCam    = false;
 var prepOpts = { gray: true, contrast: true, sharp: true, thresh: false };
-var offCanvas = document.createElement('canvas'); // reused for preprocessing
+var offCanvas = document.createElement('canvas');
+
+// ══════════════════════════════════════
+//  EXIF ORIENTATION READER
+//  Returns orientation value 1-8
+//  1 = normal, 6 = 90°CW (phone portrait), 8 = 90°CCW, 3 = 180°
+// ══════════════════════════════════════
+function getExifOrientation(arrayBuffer) {
+  try {
+    var view = new DataView(arrayBuffer);
+    // Check JPEG SOI marker
+    if (view.getUint16(0, false) !== 0xFFD8) return 1;
+    var length = view.byteLength;
+    var offset = 2;
+    while (offset < length - 2) {
+      var marker = view.getUint16(offset, false);
+      offset += 2;
+      if (marker === 0xFFE1) {
+        // APP1 - check for Exif header
+        var segLen = view.getUint16(offset, false);
+        if (view.getUint32(offset + 2, false) !== 0x45786966) return 1; // "Exif"
+        var little = view.getUint16(offset + 8, false) === 0x4949; // "II" = little endian
+        var ifdOffset = view.getUint32(offset + 12, little);
+        var ifdBase = offset + 8;
+        var tags = view.getUint16(ifdBase + ifdOffset, little);
+        for (var i = 0; i < tags; i++) {
+          var tagOffset = ifdBase + ifdOffset + 2 + i * 12;
+          if (tagOffset + 12 > length) break;
+          var tag = view.getUint16(tagOffset, little);
+          if (tag === 0x0112) { // Orientation tag
+            return view.getUint16(tagOffset + 8, little);
+          }
+        }
+        return 1;
+      } else if ((marker & 0xFF00) !== 0xFF00) {
+        break;
+      } else {
+        var segLen2 = view.getUint16(offset, false);
+        if (segLen2 < 2) break;
+        offset += segLen2;
+      }
+    }
+  } catch(e) {}
+  return 1;
+}
+
+// ══════════════════════════════════════
+//  APPLY EXIF ROTATION TO CANVAS
+//  Draws img onto ctx with correct rotation
+//  Returns {w, h} of the corrected output dimensions
+// ══════════════════════════════════════
+function drawWithExifCorrection(ctx, img, orientation, targetW, targetH) {
+  // targetW/targetH are the CORRECTED dimensions (after rotation)
+  // img.naturalWidth/naturalHeight are the RAW stored dimensions
+  ctx.save();
+  switch (orientation) {
+    case 2:
+      // Flip horizontal
+      ctx.translate(targetW, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(img, 0, 0, targetW, targetH);
+      break;
+    case 3:
+      // Rotate 180°
+      ctx.translate(targetW, targetH);
+      ctx.rotate(Math.PI);
+      ctx.drawImage(img, 0, 0, targetW, targetH);
+      break;
+    case 4:
+      // Flip vertical
+      ctx.translate(0, targetH);
+      ctx.scale(1, -1);
+      ctx.drawImage(img, 0, 0, targetW, targetH);
+      break;
+    case 5:
+      // Rotate 90° CW + Flip horizontal
+      // raw: W×H → corrected: H×W
+      ctx.translate(targetW, 0);
+      ctx.rotate(Math.PI / 2);
+      ctx.scale(1, -1);
+      ctx.drawImage(img, 0, 0, targetH, targetW); // draw in raw dims
+      break;
+    case 6:
+      // Rotate 90° CW (most common iPhone portrait)
+      // raw: W×H (landscape) → corrected: H×W (portrait)
+      ctx.translate(targetW, 0);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(img, 0, 0, targetH, targetW); // draw in raw dims
+      break;
+    case 7:
+      // Rotate 90° CCW + Flip horizontal
+      ctx.translate(0, targetH);
+      ctx.rotate(-Math.PI / 2);
+      ctx.scale(1, -1);
+      ctx.drawImage(img, 0, 0, targetH, targetW);
+      break;
+    case 8:
+      // Rotate 90° CCW
+      // raw: W×H (landscape) → corrected: H×W (portrait)
+      ctx.translate(0, targetH);
+      ctx.rotate(-Math.PI / 2);
+      ctx.drawImage(img, 0, 0, targetH, targetW); // draw in raw dims
+      break;
+    default:
+      // No rotation needed (orientation 1)
+      ctx.drawImage(img, 0, 0, targetW, targetH);
+      break;
+  }
+  ctx.restore();
+}
+
+// Get corrected dimensions based on EXIF orientation
+function getCorrectedDims(naturalW, naturalH, orientation) {
+  if (orientation >= 5 && orientation <= 8) {
+    return { w: naturalH, h: naturalW }; // swap for 90°/270° rotations
+  }
+  return { w: naturalW, h: naturalH };
+}
 
 // ══════════════════════════════════════
 //  TOGGLE PREP OPTIONS
@@ -390,7 +429,6 @@ document.getElementById('cameraInput').onchange = function() {
   });
 };
 
-// Drag & drop
 var uc = document.getElementById('ucard');
 uc.addEventListener('dragover',  function(e){ e.preventDefault(); uc.style.borderColor='var(--cyan)'; });
 uc.addEventListener('dragleave', function(e){ if (!uc.contains(e.relatedTarget)) uc.style.borderColor=''; });
@@ -401,28 +439,44 @@ uc.addEventListener('drop', function(e) {
 });
 
 // ══════════════════════════════════════
-//  HANDLE FILES
+//  HANDLE FILES — reads EXIF before dataURL
 // ══════════════════════════════════════
 function handleFiles(files, cb) {
-  var imgs = files.filter(function(f){return f.type.startsWith('image/');});
+  var imgs = files.filter(function(f){ return f.type.startsWith('image/'); });
   if (!imgs.length) return;
   var done = 0;
   imgs.forEach(function(file) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var dataUrl = e.target.result;
-      getImgDims(dataUrl).then(function(dims) {
-        images.push({ dataUrl:dataUrl, mime:file.type||'image/jpeg', w:dims.w, h:dims.h, isLand:dims.w>dims.h });
-        done++; if (done===imgs.length) { renderGrid(); if(cb) cb(); }
-      });
+    // Step 1: read as ArrayBuffer to extract EXIF orientation
+    var arReader = new FileReader();
+    arReader.onload = function(e1) {
+      var orientation = getExifOrientation(e1.target.result);
+      // Step 2: read as dataURL for display and processing
+      var drReader = new FileReader();
+      drReader.onload = function(e2) {
+        var dataUrl = e2.target.result;
+        // Step 3: get raw image dimensions, then compute corrected dims
+        var imgEl = new Image();
+        imgEl.onload = function() {
+          var corrected = getCorrectedDims(imgEl.naturalWidth, imgEl.naturalHeight, orientation);
+          images.push({
+            dataUrl:     dataUrl,
+            mime:        file.type || 'image/jpeg',
+            w:           corrected.w,   // corrected width (after rotation)
+            h:           corrected.h,   // corrected height
+            rawW:        imgEl.naturalWidth,
+            rawH:        imgEl.naturalHeight,
+            isLand:      corrected.w > corrected.h,
+            orientation: orientation
+          });
+          done++;
+          if (done === imgs.length) { renderGrid(); if(cb) cb(); }
+        };
+        imgEl.onerror = function() { done++; if (done === imgs.length) { renderGrid(); if(cb) cb(); } };
+        imgEl.src = dataUrl;
+      };
+      drReader.readAsDataURL(file);
     };
-    reader.readAsDataURL(file);
-  });
-}
-
-function getImgDims(url) {
-  return new Promise(function(res,rej) {
-    var i=new Image(); i.onload=function(){res({w:i.naturalWidth,h:i.naturalHeight});}; i.onerror=rej; i.src=url;
+    arReader.readAsArrayBuffer(file);
   });
 }
 
@@ -438,10 +492,14 @@ function renderGrid() {
     var d=document.createElement('div');
     d.className='ith'+(im.isLand?' land':'');
     d.id='th'+i;
-    d.innerHTML='<img src="'+im.dataUrl+'" alt="p'+(i+1)+'" loading="lazy">'
+    var exifTag = im.orientation !== 1
+      ? '<div class="exif-badge">EXIF '+im.orientation+'</div>'
+      : '';
+    d.innerHTML='<img src="'+im.dataUrl+'" alt="p'+(i+1)+'" loading="lazy" style="transform:'+exifRotationCSS(im.orientation)+';transform-origin:center;object-fit:cover;">'
       +'<button class="rm" onclick="removeImg('+i+')">✕</button>'
       +'<div class="pg">p.'+(i+1)+'</div>'
       +'<div class="ori">'+(im.isLand?'↔':'↕')+'</div>'
+      +exifTag
       +'<div class="spin">⏳</div>'
       +'<div class="ok-overlay">✓</div>';
     g.appendChild(d);
@@ -449,6 +507,21 @@ function renderGrid() {
   document.getElementById('procBtn').disabled=images.length===0;
   hideErr();
 }
+
+// CSS transform for thumbnail preview (so thumb looks correct)
+function exifRotationCSS(o) {
+  switch(o) {
+    case 2: return 'scaleX(-1)';
+    case 3: return 'rotate(180deg)';
+    case 4: return 'scaleY(-1)';
+    case 5: return 'rotate(90deg) scaleX(-1)';
+    case 6: return 'rotate(90deg)';
+    case 7: return 'rotate(-90deg) scaleX(-1)';
+    case 8: return 'rotate(-90deg)';
+    default: return 'none';
+  }
+}
+
 function setThumb(i, state) {
   var el=document.getElementById('th'+i);
   if (!el) return;
@@ -475,26 +548,38 @@ function hideErr(){document.getElementById('errb').classList.remove('on');}
 
 // ══════════════════════════════════════
 //  IMAGE PREPROCESSING (Canvas)
-//  Returns a processed dataUrl for Tesseract
+//  NOW WITH EXIF ROTATION CORRECTION
 // ══════════════════════════════════════
-function preprocessImage(dataUrl, opts) {
+function preprocessImage(imgData, opts) {
   return new Promise(function(resolve) {
     var img = new Image();
     img.onload = function() {
-      var W = img.naturalWidth, H = img.naturalHeight;
-      // Scale up small images for better OCR (max 3000px wide)
-      var scale = Math.min(3, Math.max(1, 2400 / Math.max(W, H)));
-      var cW = Math.round(W * scale), cH = Math.round(H * scale);
+      var rawW = img.naturalWidth;
+      var rawH = img.naturalHeight;
+      var orientation = imgData.orientation || 1;
+
+      // Corrected dimensions (after applying EXIF rotation)
+      var corrDims = getCorrectedDims(rawW, rawH, orientation);
+      var corrW = corrDims.w;
+      var corrH = corrDims.h;
+
+      // Scale up small images for better OCR (max 2400px on longest side)
+      var scale = Math.min(3, Math.max(1, 2400 / Math.max(corrW, corrH)));
+      var cW = Math.round(corrW * scale);
+      var cH = Math.round(corrH * scale);
 
       offCanvas.width  = cW;
       offCanvas.height = cH;
       var ctx = offCanvas.getContext('2d');
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, 0, 0, cW, cH);
 
-      var imgData = ctx.getImageData(0, 0, cW, cH);
-      var d = imgData.data;
+      // ── DRAW WITH EXIF CORRECTION ──────────
+      drawWithExifCorrection(ctx, img, orientation, cW, cH);
+      // ──────────────────────────────────────
+
+      var imgPixels = ctx.getImageData(0, 0, cW, cH);
+      var d = imgPixels.data;
 
       // Step 1: Grayscale
       if (opts.gray || opts.contrast || opts.sharp || opts.thresh) {
@@ -504,16 +589,13 @@ function preprocessImage(dataUrl, opts) {
         }
       }
 
-      // Step 2: Contrast boost (levels stretch)
+      // Step 2: Contrast boost
       if (opts.contrast) {
-        // Find min/max in grayscale
         var mn=255, mx=0;
         for (var i=0; i<d.length; i+=4) { if(d[i]<mn)mn=d[i]; if(d[i]>mx)mx=d[i]; }
         var range=mx-mn||1;
-        // Stretch with extra punch: compress midtones
         for (var i=0; i<d.length; i+=4) {
           var v=((d[i]-mn)/range)*255;
-          // S-curve for more contrast
           v = v < 128
             ? 128 * Math.pow(v/128, 0.75)
             : 255 - 128 * Math.pow((255-v)/128, 0.75);
@@ -522,7 +604,7 @@ function preprocessImage(dataUrl, opts) {
         }
       }
 
-      // Step 3: Unsharp mask simulation (sharpen)
+      // Step 3: Unsharp mask (sharpen)
       if (opts.sharp) {
         var src = new Uint8ClampedArray(d);
         var kernel = [0,-1,0,-1,5,-1,0,-1,0];
@@ -540,9 +622,8 @@ function preprocessImage(dataUrl, opts) {
         }
       }
 
-      // Step 4: Hard threshold (Otsu-like simple)
+      // Step 4: Hard threshold (Otsu)
       if (opts.thresh) {
-        // Compute histogram
         var hist=new Array(256).fill(0);
         for (var i=0;i<d.length;i+=4) hist[d[i]]++;
         var total=cW*cH, sum=0;
@@ -562,17 +643,17 @@ function preprocessImage(dataUrl, opts) {
         }
       }
 
-      ctx.putImageData(imgData, 0, 0);
+      ctx.putImageData(imgPixels, 0, 0);
       resolve(offCanvas.toDataURL('image/png'));
     };
-    img.src = dataUrl;
+    img.src = imgData.dataUrl;
   });
 }
 
 // ══════════════════════════════════════
 //  OCR — Tesseract word-level bbox
 // ══════════════════════════════════════
-function runOCR(processedUrl, pageIdx, total, origW, origH) {
+function runOCR(processedUrl, pageIdx, total) {
   return Tesseract.recognize(processedUrl, 'spa', {
     logger: function(m) {
       if (m.status === 'recognizing text') {
@@ -586,21 +667,17 @@ function runOCR(processedUrl, pageIdx, total, origW, origH) {
     var totalConf = 0, wCount = 0;
     var data = result.data;
 
-    // Use word-level bboxes
     if (data.words && data.words.length) {
-      // Get actual processed image dimensions from canvas
-      var procW = offCanvas.width  || origW;
-      var procH = offCanvas.height || origH;
+      var procW = offCanvas.width;
+      var procH = offCanvas.height;
 
       data.words.forEach(function(w) {
         if (!w.text || !w.text.trim() || w.confidence < 25) return;
-        // Clean: keep only latin + spanish chars + punctuation
         var clean = w.text.replace(/[^\x20-\x7EáéíóúÁÉÍÓÚüÜñÑ¿¡«»\-]/g, '').trim();
         if (!clean || clean.length < 1) return;
-        // Scale bbox back to original image coords
         words.push({
           text: clean,
-          x0:  w.bbox.x0 / procW,   // normalized 0-1
+          x0:  w.bbox.x0 / procW,
           y0:  w.bbox.y0 / procH,
           x1:  w.bbox.x1 / procW,
           y1:  w.bbox.y1 / procH,
@@ -640,12 +717,11 @@ function startProcess() {
   document.getElementById('statsBox').classList.remove('on');
   document.getElementById('dls').classList.remove('on');
 
-  log('Inicio · '+images.length+' pág. · Tesseract spa · PSM 1 · bbox posicional','act');
+  var exifFixed = images.filter(function(im){ return im.orientation !== 1; }).length;
+  log('Inicio · '+images.length+' pág. · Tesseract spa · bbox posicional','act');
   log('Preprocesado: '+Object.keys(prepOpts).filter(function(k){return prepOpts[k];}).join(', '));
+  if (exifFixed) log('📱 '+exifFixed+' imagen(es) con corrección EXIF aplicada','warn');
   log(materia+' · Unidad '+unidad+' · "'+titulo+'"');
-
-  var landC = images.filter(function(im){return im.isLand;}).length;
-  if (landC) log('↔ '+landC+' horizontal detectada(s)','warn');
 
   var total=images.length, totalW=0, totalConf=0, confPg=0;
   var docPages=[];
@@ -654,10 +730,11 @@ function startProcess() {
   images.forEach(function(img,i) {
     chain = chain.then(function() {
       setThumb(i,'processing');
-      log('→ Preprocesando pág. '+(i+1)+'...','act');
-      return preprocessImage(img.dataUrl, prepOpts).then(function(processedUrl) {
+      var exifNote = img.orientation !== 1 ? ' [EXIF→'+img.orientation+']' : '';
+      log('→ Preprocesando pág. '+(i+1)+exifNote+'...','act');
+      return preprocessImage(img, prepOpts).then(function(processedUrl) {
         log('→ OCR pág. '+(i+1)+'/'+total+'...','act');
-        return runOCR(processedUrl, i, total, img.w, img.h);
+        return runOCR(processedUrl, i, total);
       }).then(function(ocrData) {
         totalW    += ocrData.count;
         totalConf += ocrData.avgConf;
@@ -683,6 +760,7 @@ function startProcess() {
 
     docPages.forEach(function(page,i) {
       var im=page.img;
+      // Use corrected dimensions for orientation
       var orient=im.isLand?'landscape':'portrait';
       var PW=im.isLand?297:210, PH=im.isLand?210:297;
 
@@ -692,32 +770,38 @@ function startProcess() {
         doc.addPage('a4',orient);
       }
 
-      // Image fills page completely
-      var ratio=Math.min(PW/im.w, PH/im.h);
-      var iw=im.w*ratio, ih=im.h*ratio;
-      var ix=(PW-iw)/2, iy=(PH-ih)/2;
-      var fmt=im.mime.includes('png')?'PNG':'JPEG';
-      doc.addImage(im.dataUrl,fmt,ix,iy,iw,ih,undefined,'FAST');
+      // For the PDF image, we need a pre-rotated version
+      // We'll use a temp canvas to get the corrected image dataUrl
+      var tmpCanvas = document.createElement('canvas');
+      var corrW = im.w, corrH = im.h;
+      var scale = Math.min(1, 1800 / Math.max(corrW, corrH)); // smaller for PDF size
+      tmpCanvas.width  = Math.round(corrW * scale);
+      tmpCanvas.height = Math.round(corrH * scale);
+      var tmpCtx = tmpCanvas.getContext('2d');
 
-      // ── POSITIONAL TEXT LAYER ─────────────────────
-      // Each word bbox is in normalized coords (0-1).
-      // Map to mm position within the image area on the page.
-      // Text is invisible — only the positions matter for copy/search.
+      var tmpImg = new Image();
+      tmpImg.src = im.dataUrl;
+      drawWithExifCorrection(tmpCtx, tmpImg, im.orientation, tmpCanvas.width, tmpCanvas.height);
+      var correctedDataUrl = tmpCanvas.toDataURL('image/jpeg', 0.88);
+
+      var ratio=Math.min(PW/corrW, PH/corrH);
+      var iw=corrW*ratio, ih=corrH*ratio;
+      var ix=(PW-iw)/2, iy=(PH-ih)/2;
+
+      doc.addImage(correctedDataUrl,'JPEG',ix,iy,iw,ih,undefined,'FAST');
+
+      // Text layer
       if (page.ocr.words.length > 0) {
         page.ocr.words.forEach(function(w) {
-          // Convert normalized coords → mm on PDF page
           var xMm = ix + w.x0 * iw;
-          var yMm = iy + w.y1 * ih;   // y1 = bottom = baseline in PDF
+          var yMm = iy + w.y1 * ih;
           var hMm = (w.y1 - w.y0) * ih;
-          // Font size in points from word height in mm
           var ptSz = Math.max(3.5, Math.min(36, hMm / 0.353));
-
           doc.setFontSize(ptSz);
           doc.setFont('helvetica','normal');
           try {
             doc.text(w.text+' ', xMm, yMm, {renderingMode:'invisible'});
           } catch(ex) {
-            // Fallback — white zero-size text
             doc.setTextColor(255,255,255); doc.setFontSize(0.1);
             doc.text(w.text+' ', xMm, yMm);
             doc.setFontSize(ptSz); doc.setTextColor(0,0,0);
@@ -726,12 +810,11 @@ function startProcess() {
       }
     });
 
-    // PDF metadata
     doc.setProperties({
       title:   materia+' - Unidad '+unidad+' - '+titulo,
       subject: materia,
       keywords:materia+', Unidad '+unidad+', OCR, Psicoanálisis',
-      creator: 'NeuroscanOCR v6 · Local',
+      creator: 'NeuroscanOCR v7 · Local · EXIF',
       author:  materia
     });
 
@@ -739,10 +822,11 @@ function startProcess() {
     pdfBlob=doc.output('blob');
     setBar(100,'¡Completado!');
 
-    // Stats
     var avgC=confPg>0?Math.round(totalConf/confPg):0;
     var vC=docPages.filter(function(p){return !p.img.isLand;}).length;
     var lC=docPages.length-vC;
+    var exifCnt=images.filter(function(im){return im.orientation!==1;}).length;
+
     document.getElementById('stP').textContent=total+' páginas';
     document.getElementById('stP').className='sv hi';
     document.getElementById('stW').textContent=totalW.toLocaleString('es')+' palabras';
@@ -751,7 +835,8 @@ function startProcess() {
     document.getElementById('stC').className='sv '+(avgC>=70?'hi':avgC>=45?'mid':'lo');
     document.getElementById('stO').textContent=(vC?vC+'↕ vert.':'')+(vC&&lC?' + ':'')+(lC?lC+'↔ horiz.':'');
     document.getElementById('stO').className='sv def';
-    document.getElementById('statsBox').classList.add('on');
+    document.getElementById('stE').textContent=exifCnt ? exifCnt+' corregida(s) ✓' : 'ninguna necesaria';
+    document.getElementById('stE').className='sv '+(exifCnt?'mid':'hi');
 
     log('✓ '+total+' págs. · '+totalW+' palabras · conf. '+avgC+'%','ok');
     log('✓ "'+pdfFname+'" listo para descargar','ok');
@@ -767,8 +852,6 @@ function startProcess() {
     setBar(0,'Error');
   });
 }
-
-
 
 // ══════════════════════════════════════
 //  DOWNLOAD / RESET
