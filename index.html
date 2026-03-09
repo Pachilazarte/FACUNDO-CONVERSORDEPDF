@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NEUROSCAN · OCR PDF v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;400;600;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+  :root {
+    --cyan: #00e5ff; --purple: #9d4edd; --green: #39ff7a;
+    --pink: #ff2d78; --gold: #ffc400;
+    --bg: #020510; --surface: rgba(0,229,255,.04);
+    --border: rgba(0,229,255,.15); --border-hot: rgba(0,229,255,.5);
+    --text: #c8f0ff; --dim: rgba(200,240,255,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);background-size:44px 44px;z-index:0;animation:gs 30s linear infinite;}
+  @keyframes gs{to{background-position:0 44px}}
+  .orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;animation:fo 12s ease-in-out infinite;}
+  .o1{width:550px;height:550px;background:rgba(0,229,255,.05);top:-160px;right:-160px;}
+  .o2{width:450px;height:450px;background:rgba(157,78,221,.065);bottom:-50px;left:-180px;animation-delay:-5s;}
+  @keyframes fo{0%,100%{transform:translateY(0)}50%{transform:translateY(-28px)}}
+  .wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:20px 16px 60px;}
+
+  /* Header */
+  .hdr{text-align:center;padding:30px 0 38px;}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.07);border:1px solid var(--border);border-radius:100px;padding:5px 16px 5px 9px;margin-bottom:16px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:2.5px;}
+  .pdot{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);animation:pd 1.8s ease-in-out infinite;}
+  @keyframes pd{0%,100%{opacity:1}50%{opacity:.25}}
+  h1{font-size:clamp(2.4rem,7.5vw,4rem);font-weight:900;letter-spacing:-1.5px;line-height:1;background:linear-gradient(135deg,#fff 0%,var(--cyan) 40%,var(--purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:9px;}
+  .sub{font-size:.76rem;color:var(--dim);letter-spacing:2.5px;font-family:'Share Tech Mono',monospace;}
+
+  /* Card */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:14px;backdrop-filter:blur(18px);transition:border-color .3s;}
+  .card:focus-within{border-color:rgba(0,229,255,.28);}
+  .ch{display:flex;align-items:center;gap:11px;margin-bottom:20px;}
+  .sn{width:29px;height:29px;flex-shrink:0;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#000;}
+  .ct{font-size:.92rem;font-weight:700;}
+  .cs{font-size:.7rem;color:var(--dim);font-family:'Share Tech Mono',monospace;margin-top:2px;}
+
+  /* Form */
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:460px){.fg{grid-template-columns:1fr;}}
+  .fi{display:flex;flex-direction:column;gap:6px;}
+  .fi.fw{grid-column:1/-1;}
+  label{font-size:.66rem;font-family:'Share Tech Mono',monospace;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;}
+  select,input[type=text]{background:rgba(0,229,255,.03);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.87rem;font-weight:600;outline:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s,background .2s;}
+  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2300e5ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+  select option{background:#080f22;}
+  select:focus,input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.1);background:rgba(0,229,255,.05);}
+  input::placeholder{color:var(--dim);font-weight:400;}
+
+  /* Upload */
+  .ocr-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(157,78,221,.08);border:1px solid rgba(157,78,221,.25);border-radius:100px;padding:4px 12px;font-family:'Share Tech Mono',monospace;font-size:.67rem;color:rgba(200,180,255,.85);margin-bottom:14px;}
+  .ua{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:12px;}
+  .ubtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:20px 10px;background:rgba(0,229,255,.035);border:1.5px dashed var(--border);border-radius:15px;cursor:pointer;font-family:'Exo 2',sans-serif;color:var(--text);transition:all .25s;width:100%;-webkit-appearance:none;}
+  .ubtn:hover,.ubtn:active{border-color:var(--cyan);background:rgba(0,229,255,.07);transform:translateY(-2px);color:var(--cyan);}
+  .ubtn .ico{font-size:1.7rem;line-height:1;}
+  .ubtn .lbl{font-size:.8rem;font-weight:700;}
+  .ubtn .hnt{font-size:.65rem;color:var(--dim);font-family:'Share Tech Mono',monospace;}
+  #fileInput,#cameraInput{display:none!important;}
+
+  /* Camera bar */
+  .cbar{display:none;align-items:center;gap:8px;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);border-radius:11px;padding:11px 13px;margin-bottom:12px;flex-wrap:wrap;}
+  .cbar.on{display:flex;}
+  .cbar-t{font-size:.8rem;flex:1;min-width:100px;}
+  .cbar-t strong{color:var(--cyan);}
+  .btn-ns{background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;border-radius:7px;padding:8px 16px;color:#000;font-family:'Exo 2',sans-serif;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap;}
+  .btn-cd{background:transparent;border:1px solid rgba(0,229,255,.3);border-radius:7px;padding:8px 13px;color:var(--dim);font-family:'Exo 2',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+
+  .drop-h{text-align:center;padding:7px;font-size:.67rem;color:var(--dim);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+
+  /* Orientation badge */
+  .orient-bar{display:none;align-items:center;gap:8px;background:rgba(255,196,0,.06);border:1px solid rgba(255,196,0,.2);border-radius:10px;padding:9px 13px;margin-bottom:12px;font-size:.74rem;font-family:'Share Tech Mono',monospace;color:rgba(255,220,100,.85);}
+  .orient-bar.on{display:flex;}
+
+  /* Image grid */
+  .imgs-s{display:none;}
+  .imgs-s.on{display:block;}
+  .cntbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;margin-top:12px;}
+  .cpill{display:inline-flex;align-items:center;gap:6px;background:rgba(57,255,122,.07);border:1px solid rgba(57,255,122,.22);border-radius:100px;padding:4px 13px;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);}
+  .cpill .d{width:5px;height:5px;background:var(--green);border-radius:50%;box-shadow:0 0 5px var(--green);}
+  .btn-clr{background:transparent;border:1px solid rgba(255,45,120,.25);border-radius:7px;padding:4px 11px;color:rgba(255,45,120,.7);font-size:.7rem;font-family:'Share Tech Mono',monospace;cursor:pointer;transition:all .2s;}
+  .btn-clr:hover{border-color:var(--pink);color:var(--pink);}
+  .igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:7px;}
+  .ith{position:relative;aspect-ratio:3/4;border-radius:9px;overflow:hidden;border:1px solid var(--border);background:rgba(0,0,0,.4);transition:transform .2s,border-color .2s;}
+  .ith.land{aspect-ratio:4/3;}
+  .ith:hover{transform:scale(1.05);border-color:var(--border-hot);}
+  .ith img{width:100%;height:100%;object-fit:cover;display:block;}
+  .ith .rm{position:absolute;top:3px;right:3px;width:19px;height:19px;background:rgba(255,45,120,.9);border:none;border-radius:50%;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-weight:bold;}
+  .ith:hover .rm,.ith .rm:focus{opacity:1;}
+  .ith .pg{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.75);border-radius:3px;padding:1px 5px;font-size:9px;font-family:'Share Tech Mono',monospace;color:var(--cyan);}
+  .ith .ori{position:absolute;top:3px;left:3px;background:rgba(255,196,0,.8);border-radius:3px;padding:1px 5px;font-size:8px;font-family:'Share Tech Mono',monospace;color:#000;font-weight:700;}
+
+  /* Progress */
+  .prog-s{display:none;margin-bottom:14px;}
+  .prog-s.on{display:block;}
+  .plog{background:rgba(0,0,0,.55);border:1px solid var(--border);border-radius:11px;padding:13px 15px;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);max-height:160px;overflow-y:auto;line-height:1.9;margin-bottom:12px;}
+  .ll{display:flex;gap:7px;}
+  .lts{color:rgba(0,229,255,.32);flex-shrink:0;}
+  .lm.ok{color:var(--green);}
+  .lm.act{color:var(--cyan);}
+  .lm.warn{color:var(--gold);}
+  .lm.err{color:var(--pink);}
+  .bw{background:rgba(255,255,255,.05);border-radius:100px;height:5px;overflow:hidden;margin-bottom:6px;}
+  .bf{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:100px;transition:width .3s ease;box-shadow:0 0 10px rgba(0,229,255,.4);width:0%;}
+  .bl{font-size:.69rem;font-family:'Share Tech Mono',monospace;color:var(--dim);text-align:center;margin-bottom:14px;}
+
+  /* Info box - OCR quality */
+  .qual-box{display:none;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);border-radius:11px;padding:13px 15px;margin-bottom:14px;}
+  .qual-box.on{display:block;}
+  .qual-row{display:flex;align-items:center;justify-content:space-between;font-size:.73rem;font-family:'Share Tech Mono',monospace;color:var(--dim);margin-bottom:5px;}
+  .qual-row:last-child{margin-bottom:0;}
+  .qual-val{color:var(--text);font-weight:700;}
+  .qual-val.hi{color:var(--green);}
+  .qual-val.mid{color:var(--gold);}
+  .qual-val.lo{color:var(--pink);}
+
+  /* CTA */
+  .btn-proc{width:100%;padding:16px;border:none;border-radius:13px;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#000;font-family:'Exo 2',sans-serif;font-size:.92rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+  .btn-proc::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);opacity:0;transition:opacity .3s;}
+  .btn-proc:hover::after{opacity:1;}
+  .btn-proc:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(0,229,255,.28);}
+  .btn-proc:disabled{opacity:.32;cursor:not-allowed;transform:none;box-shadow:none;}
+  .errb{background:rgba(255,45,120,.07);border:1px solid rgba(255,45,120,.3);border-radius:9px;padding:10px 14px;font-size:.76rem;color:#ff8cb0;margin-top:11px;display:none;font-family:'Share Tech Mono',monospace;line-height:1.6;}
+  .errb.on{display:block;}
+
+  /* Download */
+  .dls{display:none;text-align:center;margin-top:4px;}
+  .dls.on{display:block;}
+  .sring{width:66px;height:66px;margin:0 auto 15px;background:linear-gradient(135deg,rgba(57,255,122,.14),rgba(0,229,255,.1));border:2px solid rgba(57,255,122,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27px;animation:rp .5s cubic-bezier(.34,1.56,.64,1) forwards;}
+  @keyframes rp{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+  .dlt{font-size:1.15rem;font-weight:800;color:var(--green);margin-bottom:5px;}
+  .dlf{font-size:.7rem;font-family:'Share Tech Mono',monospace;color:var(--dim);margin-bottom:20px;word-break:break-all;padding:0 12px;}
+  .btn-dl{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--green),var(--cyan));border:none;border-radius:13px;padding:14px 28px;color:#000;font-family:'Exo 2',sans-serif;font-size:.92rem;font-weight:900;cursor:pointer;transition:all .3s;text-transform:uppercase;letter-spacing:1px;margin-bottom:11px;}
+  .btn-dl:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(57,255,122,.28);}
+  .btn-rst{display:block;width:100%;background:transparent;border:1px solid var(--border);border-radius:11px;padding:11px;color:var(--dim);font-family:'Exo 2',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:9px;}
+  .btn-rst:hover{border-color:var(--border-hot);color:var(--text);}
+  ::-webkit-scrollbar{width:3px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .foot{text-align:center;padding:14px;font-size:.62rem;font-family:'Share Tech Mono',monospace;color:rgba(200,240,255,.1);letter-spacing:1.5px;}
+</style>
+</head>
+<body>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+
+<div class="wrap">
+  <div class="hdr">
+    <div class="badge"><div class="pdot"></div>NEUROSCAN · OCR POSICIONAL v4</div>
+    <h1>NEUROSCAN</h1>
+    <p class="sub">FOTOS → OCR EXACTO → PDF INTELIGENTE</p>
+  </div>
+
+  <!-- 01 Metadatos -->
+  <div class="card">
+    <div class="ch"><div class="sn">01</div>
+      <div><div class="ct">Identificación del Documento</div>
+        <div class="cs">Materia · Unidad · Título</div></div>
+    </div>
+    <div class="fg">
+      <div class="fi"><label>Materia</label>
+        <select id="materia"><option value="Psicoanálisis">Psicoanálisis</option></select></div>
+      <div class="fi"><label>Unidad</label>
+        <select id="unidad">
+          <option value="1">Unidad 1</option><option value="2">Unidad 2</option>
+          <option value="3">Unidad 3</option><option value="4">Unidad 4</option>
+          <option value="5">Unidad 5</option><option value="6">Unidad 6</option>
+          <option value="7">Unidad 7</option><option value="8">Unidad 8</option>
+          <option value="9">Unidad 9</option><option value="10">Unidad 10</option>
+        </select></div>
+      <div class="fi fw"><label>Nombre del Texto</label>
+        <input type="text" id="titulo" placeholder="Ej: El inconsciente y sus formaciones..."></div>
+    </div>
+  </div>
+
+  <!-- 02 Imágenes -->
+  <div class="card" id="ucard">
+    <div class="ch"><div class="sn">02</div>
+      <div><div class="ct">Cargar Imágenes / Páginas</div>
+        <div class="cs">Detección automática horizontal/vertical</div></div>
+    </div>
+    <div class="ocr-pill">⚙ Tesseract.js v5 · OCR posicional · idioma: spa</div>
+    <div class="ua">
+      <button class="ubtn" id="btnFiles">
+        <span class="ico">🗂️</span><span class="lbl">Seleccionar archivos</span>
+        <span class="hnt">JPG · PNG · WEBP · múltiples</span>
+      </button>
+      <button class="ubtn" id="btnCam">
+        <span class="ico">📸</span><span class="lbl">Usar cámara</span>
+        <span class="hnt">Múltiples fotos continuas</span>
+      </button>
+    </div>
+    <div class="cbar" id="cbar">
+      <div class="cbar-t"><strong id="ccount">0 fotos</strong> tomadas — seguís?</div>
+      <button class="btn-ns" id="btnNS">📸 Otra foto</button>
+      <button class="btn-cd" id="btnCD">Listo ✓</button>
+    </div>
+    <div class="drop-h">o arrastrá imágenes acá</div>
+    <input type="file" id="fileInput" accept="image/*" multiple>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment">
+
+    <div class="imgs-s" id="imgsS">
+      <div class="cntbar">
+        <div class="cpill"><div class="d"></div><span id="icnt">0 páginas</span></div>
+        <button class="btn-clr" onclick="clearAll()">✕ limpiar</button>
+      </div>
+      <div class="igrid" id="igrid"></div>
+    </div>
+  </div>
+
+  <!-- 03 Proceso -->
+  <div class="card">
+    <div class="ch"><div class="sn">03</div>
+      <div><div class="ct">Procesar y Generar PDF</div>
+        <div class="cs">OCR posicional · texto en coordenadas exactas</div></div>
+    </div>
+    <div class="prog-s" id="progS">
+      <div class="plog" id="plog"></div>
+      <div class="qual-box" id="qualBox">
+        <div class="qual-row"><span>Palabras detectadas</span><span class="qual-val" id="qWords">—</span></div>
+        <div class="qual-row"><span>Confianza promedio</span><span class="qual-val" id="qConf">—</span></div>
+        <div class="qual-row"><span>Orientación</span><span class="qual-val" id="qOri">—</span></div>
+      </div>
+      <div class="bw"><div class="bf" id="bf"></div></div>
+      <div class="bl" id="bl">Esperando...</div>
+    </div>
+    <button class="btn-proc" id="procBtn" onclick="startProcess()">⚡ GENERAR PDF CON OCR POSICIONAL</button>
+    <div class="errb" id="errb"></div>
+    <div class="dls" id="dls">
+      <div class="sring">✓</div>
+      <div class="dlt">PDF Generado</div>
+      <div class="dlf" id="dlf"></div>
+      <button class="btn-dl" id="dlBtn">⬇ DESCARGAR PDF</button>
+      <button class="btn-rst" onclick="resetAll()">↩ Procesar nuevas imágenes</button>
+    </div>
+  </div>
+
+  <div class="foot">NEUROSCAN v4 · OCR POSICIONAL · WORD-BBOX · ORIENTACIÓN AUTOMÁTICA</div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════
+var images = [];      // {dataUrl, mime, w, h, isLandscape}
+var pdfBlob = null;
+var pdfFname = '';
+var inCam = false;
+
+// ════════════════════════════════════════════════════════
+//  WIRING
+// ════════════════════════════════════════════════════════
+document.getElementById('btnFiles').onclick = function() {
+  var inp = document.getElementById('fileInput');
+  inp.value = ''; inp.click();
+};
+document.getElementById('btnCam').onclick = function() {
+  inCam = true;
+  var inp = document.getElementById('cameraInput');
+  inp.value = ''; inp.click();
+};
+document.getElementById('btnNS').onclick = function() {
+  var inp = document.getElementById('cameraInput');
+  inp.value = ''; inp.click();
+};
+document.getElementById('btnCD').onclick = function() {
+  inCam = false;
+  document.getElementById('cbar').classList.remove('on');
+};
+
+document.getElementById('fileInput').onchange = function() {
+  var files = Array.prototype.slice.call(this.files);
+  if (files.length) handleFiles(files, null);
+};
+document.getElementById('cameraInput').onchange = function() {
+  var files = Array.prototype.slice.call(this.files);
+  if (!files.length) { if (inCam && !images.length) { inCam=false; document.getElementById('cbar').classList.remove('on'); } return; }
+  handleFiles(files, function() {
+    if (inCam) {
+      document.getElementById('cbar').classList.add('on');
+      var n = images.length;
+      document.getElementById('ccount').textContent = n + ' foto' + (n!==1?'s':'');
+    }
+  });
+};
+
+// Drag & drop
+var uc = document.getElementById('ucard');
+uc.addEventListener('dragover', function(e){ e.preventDefault(); uc.style.borderColor='var(--cyan)'; });
+uc.addEventListener('dragleave', function(e){ if(!uc.contains(e.relatedTarget)) uc.style.borderColor=''; });
+uc.addEventListener('drop', function(e){
+  e.preventDefault(); uc.style.borderColor='';
+  var files = Array.prototype.slice.call(e.dataTransfer.files).filter(function(f){return f.type.startsWith('image/');});
+  if (files.length) handleFiles(files, null);
+});
+
+// ════════════════════════════════════════════════════════
+//  FILE HANDLING
+// ════════════════════════════════════════════════════════
+function handleFiles(files, cb) {
+  var imgs = files.filter(function(f){return f.type.startsWith('image/');});
+  if (!imgs.length) return;
+  var done = 0;
+  imgs.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var dataUrl = e.target.result;
+      var mime = file.type || 'image/jpeg';
+      getImgDims(dataUrl).then(function(dims) {
+        images.push({ dataUrl:dataUrl, mime:mime, w:dims.w, h:dims.h, isLandscape: dims.w > dims.h });
+        done++;
+        if (done === imgs.length) { renderGrid(); if(cb) cb(); }
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function getImgDims(url) {
+  return new Promise(function(res,rej){
+    var img = new Image();
+    img.onload = function(){ res({w:img.naturalWidth, h:img.naturalHeight}); };
+    img.onerror = rej; img.src = url;
+  });
+}
+
+// ════════════════════════════════════════════════════════
+//  RENDER GRID
+// ════════════════════════════════════════════════════════
+function renderGrid() {
+  var section = document.getElementById('imgsS');
+  var grid = document.getElementById('igrid');
+  var cnt = document.getElementById('icnt');
+  section.className = 'imgs-s' + (images.length > 0 ? ' on' : '');
+  cnt.textContent = images.length + ' página' + (images.length!==1?'s':'') + ' cargada' + (images.length!==1?'s':'');
+  grid.innerHTML = '';
+  images.forEach(function(img, i) {
+    var div = document.createElement('div');
+    div.className = 'ith' + (img.isLandscape ? ' land' : '');
+    div.innerHTML =
+      '<img src="' + img.dataUrl + '" alt="p'+(i+1)+'" loading="lazy">' +
+      '<button class="rm" onclick="removeImg('+i+')">✕</button>' +
+      '<div class="pg">p.'+(i+1)+'</div>' +
+      '<div class="ori">'+(img.isLandscape?'↔':'↕')+'</div>';
+    grid.appendChild(div);
+  });
+  document.getElementById('procBtn').disabled = images.length === 0;
+  hideErr();
+}
+
+function removeImg(i) {
+  images.splice(i,1);
+  if (!images.length) { inCam=false; document.getElementById('cbar').classList.remove('on'); }
+  renderGrid();
+}
+function clearAll() {
+  images=[]; inCam=false;
+  document.getElementById('cbar').classList.remove('on');
+  renderGrid();
+}
+
+// ════════════════════════════════════════════════════════
+//  LOG / PROGRESS
+// ════════════════════════════════════════════════════════
+function log(msg, type) {
+  var el = document.getElementById('plog');
+  var d = new Date();
+  var ts = p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());
+  var div = document.createElement('div'); div.className='ll';
+  div.innerHTML='<span class="lts">['+ts+']</span><span class="lm '+(type||'')+'">'+msg+'</span>';
+  el.appendChild(div); el.scrollTop=el.scrollHeight;
+}
+function p2(n){ return n<10?'0'+n:n; }
+function setBar(pct,lbl){ document.getElementById('bf').style.width=pct+'%'; document.getElementById('bl').textContent=lbl; }
+function showErr(m){ var e=document.getElementById('errb'); e.textContent=m; e.classList.add('on'); }
+function hideErr(){ document.getElementById('errb').classList.remove('on'); }
+
+// ════════════════════════════════════════════════════════
+//  TEXT CLEANING
+// ════════════════════════════════════════════════════════
+function cleanWord(w) {
+  // Remove non-latin/spanish characters (keep a-z, á-ú, ñ, digits, punctuation)
+  return w.replace(/[^\x20-\x7EáéíóúÁÉÍÓÚüÜñÑ¿¡«»\-]/g, '').trim();
+}
+
+// ════════════════════════════════════════════════════════
+//  OCR — word-level with bounding boxes
+// ════════════════════════════════════════════════════════
+function runOCR(dataUrl, pageIdx, total) {
+  return Tesseract.recognize(dataUrl, 'spa', {
+    logger: function(m) {
+      if (m.status === 'recognizing text') {
+        var base = (pageIdx / total) * 88;
+        var step = (m.progress / total) * 88;
+        setBar(Math.min(88, Math.round(base + step)),
+          'OCR pág. '+(pageIdx+1)+'/'+total+' — '+Math.round(m.progress*100)+'%');
+      }
+    }
+  }).then(function(result) {
+    var data = result.data;
+    // Collect word-level data with bboxes
+    var words = [];
+    var totalConf = 0, wordCount = 0;
+
+    if (data.words && data.words.length) {
+      data.words.forEach(function(w) {
+        if (!w.text || !w.text.trim()) return;
+        var cleaned = cleanWord(w.text);
+        if (!cleaned || cleaned.length < 1) return;
+        if (w.confidence < 20) return; // skip very low confidence
+        words.push({
+          text: cleaned,
+          bbox: w.bbox,       // {x0,y0,x1,y1} in image pixels
+          conf: w.confidence,
+          fontSize: w.bbox.y1 - w.bbox.y0  // height in pixels → will be scaled
+        });
+        totalConf += w.confidence;
+        wordCount++;
+      });
+    }
+
+    var avgConf = wordCount > 0 ? Math.round(totalConf / wordCount) : 0;
+    return { words: words, avgConf: avgConf, wordCount: wordCount };
+  });
+}
+
+// ════════════════════════════════════════════════════════
+//  MAIN PROCESS
+// ════════════════════════════════════════════════════════
+function startProcess() {
+  var materia = document.getElementById('materia').value;
+  var unidad  = document.getElementById('unidad').value;
+  var titulo  = document.getElementById('titulo').value.trim();
+  hideErr();
+
+  if (!images.length) { showErr('⚠ Cargá al menos una imagen.'); return; }
+  if (!titulo) { showErr('⚠ Ingresá el nombre del texto (Paso 01).'); document.getElementById('titulo').focus(); return; }
+
+  pdfFname = materia + '-Unidad N°' + unidad + '-' + titulo.replace(/[<>:"/\\|?*]/g,'').trim() + '.pdf';
+
+  document.getElementById('procBtn').disabled = true;
+  document.getElementById('cbar').classList.remove('on'); inCam = false;
+  document.getElementById('progS').classList.add('on');
+  document.getElementById('plog').innerHTML = '';
+  document.getElementById('qualBox').classList.remove('on');
+  document.getElementById('dls').classList.remove('on');
+
+  log('Inicio · ' + images.length + ' página(s) · OCR posicional', 'act');
+  log('Motor: Tesseract.js v5 · idioma: spa · word-bbox');
+  log(materia + ' · Unidad ' + unidad + ' · "' + titulo + '"');
+
+  // Count landscape pages
+  var landCount = images.filter(function(i){return i.isLandscape;}).length;
+  if (landCount > 0) log('↔ ' + landCount + ' página(s) horizontal detectada(s)', 'warn');
+
+  var total = images.length;
+  var totalWords = 0, totalConf = 0, confPages = 0;
+
+  // Process pages sequentially
+  var chain = Promise.resolve();
+  var docPages = []; // will hold per-page data
+
+  images.forEach(function(img, i) {
+    chain = chain.then(function() {
+      log('→ Analizando página ' + (i+1) + '/' + total + ' (' + (img.isLandscape?'horizontal':'vertical') + ')...', 'act');
+      return runOCR(img.dataUrl, i, total).then(function(ocrData) {
+        totalWords += ocrData.wordCount;
+        totalConf  += ocrData.avgConf;
+        confPages++;
+        var confLabel = ocrData.avgConf >= 70 ? 'ok' : ocrData.avgConf >= 45 ? 'warn' : 'err';
+        log('✓ Pág. '+(i+1)+': '+ocrData.wordCount+' palabras · confianza '+ocrData.avgConf+'%', confLabel);
+        docPages.push({ img: img, ocr: ocrData });
+      }).catch(function(e) {
+        log('⚠ Pág. '+(i+1)+': OCR falló — '+e.message, 'warn');
+        docPages.push({ img: img, ocr: { words: [], avgConf: 0, wordCount: 0 } });
+      });
+    });
+  });
+
+  chain.then(function() {
+    setBar(90, 'Construyendo PDF...');
+    log('→ Generando PDF con capas posicionales...');
+
+    var jspdf = window.jspdf;
+
+    // Build PDF page by page
+    var doc = null;
+    docPages.forEach(function(page, i) {
+      var img = page.img;
+      // Detect orientation for this page
+      var orient = img.isLandscape ? 'landscape' : 'portrait';
+      // Page dimensions in mm (A4)
+      var PW = img.isLandscape ? 297 : 210;
+      var PH = img.isLandscape ? 210 : 297;
+
+      if (i === 0) {
+        doc = new jspdf.jsPDF({ orientation: orient, unit: 'mm', format: 'a4' });
+      } else {
+        doc.addPage('a4', orient);
+      }
+
+      // Scale image to fill entire page (no margins, full bleed)
+      var ratio = Math.min(PW / img.w, PH / img.h);
+      var iw = img.w * ratio;
+      var ih = img.h * ratio;
+      var ix = (PW - iw) / 2;
+      var iy = (PH - ih) / 2;
+
+      // Embed image
+      var fmt = img.mime.includes('png') ? 'PNG' : 'JPEG';
+      doc.addImage(img.dataUrl, fmt, ix, iy, iw, ih, undefined, 'FAST');
+
+      // ── POSITIONAL TEXT LAYER ──────────────────────────────
+      // Each word gets placed at its exact pixel position,
+      // scaled to match where it appears over the image in the PDF.
+      if (page.ocr.words.length > 0) {
+        page.ocr.words.forEach(function(word) {
+          var bb = word.bbox;
+          // Scale pixel coords → mm coords within the image area on the PDF page
+          var xMm = ix + (bb.x0 / img.w) * iw;
+          var yMm = iy + (bb.y1 / img.h) * ih; // y1 = bottom of word (baseline for PDF)
+          var hMm = ((bb.y1 - bb.y0) / img.h) * ih; // word height in mm
+
+          // Font size: convert mm height to points (1pt = 0.353mm)
+          var ptSize = Math.max(4, Math.min(48, hMm / 0.353));
+
+          doc.setFontSize(ptSize);
+          doc.setFont('helvetica', 'normal');
+
+          try {
+            doc.text(word.text + ' ', xMm, yMm, { renderingMode: 'invisible' });
+          } catch(ex) {
+            // fallback for older jspdf
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(0.5);
+            doc.text(word.text + ' ', xMm, yMm);
+            doc.setTextColor(0, 0, 0);
+          }
+        });
+      }
+    });
+
+    // Metadata
+    doc.setProperties({
+      title:    materia + ' - Unidad ' + unidad + ' - ' + titulo,
+      subject:  materia,
+      keywords: materia + ', Unidad ' + unidad + ', OCR positional',
+      creator:  'NeuroscanOCR v4',
+      author:   materia
+    });
+
+    setBar(99, 'Compilando...');
+    pdfBlob = doc.output('blob');
+    setBar(100, '¡Completado!');
+
+    // Show quality summary
+    var avgConf = confPages > 0 ? Math.round(totalConf / confPages) : 0;
+    document.getElementById('qWords').textContent = totalWords + ' palabras';
+    document.getElementById('qWords').className = 'qual-val ' + (totalWords > 100 ? 'hi' : totalWords > 20 ? 'mid' : 'lo');
+    document.getElementById('qConf').textContent = avgConf + '%';
+    document.getElementById('qConf').className = 'qual-val ' + (avgConf >= 70 ? 'hi' : avgConf >= 45 ? 'mid' : 'lo');
+    var lcount = docPages.filter(function(p){return p.img.isLandscape;}).length;
+    var vcount = docPages.length - lcount;
+    document.getElementById('qOri').textContent = (vcount ? vcount+'↕ vertical' : '') + (lcount && vcount ? ' · ' : '') + (lcount ? lcount+'↔ horizontal' : '');
+    document.getElementById('qOri').className = 'qual-val';
+    document.getElementById('qualBox').classList.add('on');
+
+    log('✓ ' + total + ' páginas · ' + totalWords + ' palabras · conf. ' + avgConf + '%', 'ok');
+    log('✓ "' + pdfFname + '" listo para descargar', 'ok');
+
+    document.getElementById('dlf').textContent = pdfFname;
+    document.getElementById('dls').classList.add('on');
+    document.getElementById('dlBtn').onclick = downloadPDF;
+
+  }).catch(function(err) {
+    log('✗ Error crítico: ' + err.message, 'err');
+    showErr('Error: ' + err.message);
+    document.getElementById('procBtn').disabled = false;
+    setBar(0, 'Error');
+  });
+}
+
+// ════════════════════════════════════════════════════════
+//  DOWNLOAD
+// ════════════════════════════════════════════════════════
+function downloadPDF() {
+  if (!pdfBlob) return;
+  var url = URL.createObjectURL(pdfBlob);
+  var a = document.createElement('a');
+  a.href = url; a.download = pdfFname;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+}
+
+function resetAll() {
+  images=[]; pdfBlob=null; pdfFname=''; inCam=false;
+  document.getElementById('progS').classList.remove('on');
+  document.getElementById('dls').classList.remove('on');
+  document.getElementById('qualBox').classList.remove('on');
+  document.getElementById('plog').innerHTML='';
+  document.getElementById('bf').style.width='0%';
+  document.getElementById('cbar').classList.remove('on');
+  document.getElementById('fileInput').value='';
+  document.getElementById('cameraInput').value='';
+  hideErr(); renderGrid();
+}
+
+document.getElementById('procBtn').disabled = true;
+</script>
+</body>
+</html>
