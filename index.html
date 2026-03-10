@@ -25,9 +25,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 @keyframes fo1{0%,100%{transform:translateY(0)}50%{transform:translateY(-25px)}}
 @keyframes fo2{0%,100%{transform:translateY(0)}50%{transform:translateY(20px)}}
 .wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:20px 16px 60px;}
-.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.07);border:1px solid var(--border);border-radius:100px;padding:5px 16px 5px 9px;margin-bottom:16px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:2.5px;}
-.pdot{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);animation:pd 1.8s ease-in-out infinite;}
-@keyframes pd{0%,100%{opacity:1}50%{opacity:.22}}
 .engine-strip{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:26px;flex-wrap:wrap;}
 .ep{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:5px 13px;font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:1px;}
 .ep1{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.25);color:var(--cyan);}
@@ -138,8 +135,6 @@ input::placeholder{color:var(--dim);font-weight:400;}
 .btn-capsule:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,.1);}
 .btn-capsule.active{color:var(--cyan);border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.08);}
 .pdot-nav{width:8px;height:8px;background:var(--cyan);border-radius:50%;box-shadow:0 0 10px var(--cyan);}
-/* EXIF badge */
-.exif-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(255,196,0,.08);border:1px solid rgba(255,196,0,.25);border-radius:4px;padding:1px 6px;font-size:8px;font-family:'Share Tech Mono',monospace;color:var(--gold);position:absolute;bottom:16px;right:3px;}
 </style>
 </head>
 <body>
@@ -148,11 +143,11 @@ input::placeholder{color:var(--dim);font-weight:400;}
 <div class="wrap">
   <div class="nav-container">
     <a href="generadordepdf.html" class="btn-capsule">← IR A APUNTES</a>
-    <div class="btn-capsule active"><div class="pdot-nav"></div> NEUROSCAN · OCR · v7</div>
+    <div class="btn-capsule active"><div class="pdot-nav"></div> NEUROSCAN · OCR · v8</div>
   </div>
 
   <div class="engine-strip">
-    <div class="ep ep4">📱 EXIF Auto-rotate</div>
+    <div class="ep ep4">📱 Auto-orientación</div>
     <span class="ea">→</span>
     <div class="ep ep1">🖼 Preprocesado Canvas</div>
     <span class="ea">→</span>
@@ -187,7 +182,7 @@ input::placeholder{color:var(--dim);font-weight:400;}
   <div class="card" id="ucard">
     <div class="ch"><div class="sn">02</div>
       <div><div class="ct">Cargar Imágenes / Páginas</div>
-        <div class="cs">Rotación EXIF automática · detección horizontal/vertical</div></div>
+        <div class="cs">Orientación automática · horizontal/vertical detectado</div></div>
     </div>
 
     <div style="margin-bottom:14px;">
@@ -243,7 +238,6 @@ input::placeholder{color:var(--dim);font-weight:400;}
         <div class="sr"><span>Palabras detectadas</span><span class="sv def" id="stW">—</span></div>
         <div class="sr"><span>Confianza promedio</span><span class="sv def" id="stC">—</span></div>
         <div class="sr"><span>Orientación</span><span class="sv def" id="stO">—</span></div>
-        <div class="sr"><span>EXIF corregidas</span><span class="sv def" id="stE">—</span></div>
         <div class="sr"><span>Motor</span><span class="sv hi">Tesseract.js v5 · spa · PSM 1</span></div>
       </div>
       <div class="bw"><div class="bf" id="bf"></div></div>
@@ -259,7 +253,7 @@ input::placeholder{color:var(--dim);font-weight:400;}
       <button class="btn-rst" onclick="resetAll()">↩ Procesar nuevas imágenes</button>
     </div>
   </div>
-  <div class="foot">NEUROSCAN v7 · EXIF AUTO-ROTATE · 100% LOCAL · TESSERACT SPA · JSPDF</div>
+  <div class="foot">NEUROSCAN v8 · AUTO-ORIENT · 100% LOCAL · TESSERACT SPA · JSPDF</div>
 </div>
 
 <script>
@@ -271,128 +265,19 @@ var pdfBlob  = null;
 var pdfFname = '';
 var inCam    = false;
 var prepOpts = { gray: true, contrast: true, sharp: true, thresh: false };
-var offCanvas = document.createElement('canvas');
 
 // ══════════════════════════════════════
-//  EXIF ORIENTATION READER
-//  Returns orientation value 1-8
-//  1 = normal, 6 = 90°CW (phone portrait), 8 = 90°CCW, 3 = 180°
+//  KEY INSIGHT: Modern browsers (Chrome, Firefox, Safari, all mobile browsers)
+//  automatically apply EXIF orientation when:
+//    1. Displaying <img> elements
+//    2. Drawing to canvas via ctx.drawImage()
+//    3. Reporting img.naturalWidth / img.naturalHeight
+//
+//  So we NEVER manually rotate — the browser handles it.
+//  naturalWidth/naturalHeight already reflect the CORRECT visual dimensions.
+//  ctx.drawImage(img) puts correctly-oriented pixels on the canvas.
 // ══════════════════════════════════════
-function getExifOrientation(arrayBuffer) {
-  try {
-    var view = new DataView(arrayBuffer);
-    // Check JPEG SOI marker
-    if (view.getUint16(0, false) !== 0xFFD8) return 1;
-    var length = view.byteLength;
-    var offset = 2;
-    while (offset < length - 2) {
-      var marker = view.getUint16(offset, false);
-      offset += 2;
-      if (marker === 0xFFE1) {
-        // APP1 - check for Exif header
-        var segLen = view.getUint16(offset, false);
-        if (view.getUint32(offset + 2, false) !== 0x45786966) return 1; // "Exif"
-        var little = view.getUint16(offset + 8, false) === 0x4949; // "II" = little endian
-        var ifdOffset = view.getUint32(offset + 12, little);
-        var ifdBase = offset + 8;
-        var tags = view.getUint16(ifdBase + ifdOffset, little);
-        for (var i = 0; i < tags; i++) {
-          var tagOffset = ifdBase + ifdOffset + 2 + i * 12;
-          if (tagOffset + 12 > length) break;
-          var tag = view.getUint16(tagOffset, little);
-          if (tag === 0x0112) { // Orientation tag
-            return view.getUint16(tagOffset + 8, little);
-          }
-        }
-        return 1;
-      } else if ((marker & 0xFF00) !== 0xFF00) {
-        break;
-      } else {
-        var segLen2 = view.getUint16(offset, false);
-        if (segLen2 < 2) break;
-        offset += segLen2;
-      }
-    }
-  } catch(e) {}
-  return 1;
-}
 
-// ══════════════════════════════════════
-//  APPLY EXIF ROTATION TO CANVAS
-//  Draws img onto ctx with correct rotation
-//  Returns {w, h} of the corrected output dimensions
-// ══════════════════════════════════════
-function drawWithExifCorrection(ctx, img, orientation, targetW, targetH) {
-  // targetW/targetH are the CORRECTED dimensions (after rotation)
-  // img.naturalWidth/naturalHeight are the RAW stored dimensions
-  ctx.save();
-  switch (orientation) {
-    case 2:
-      // Flip horizontal
-      ctx.translate(targetW, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(img, 0, 0, targetW, targetH);
-      break;
-    case 3:
-      // Rotate 180°
-      ctx.translate(targetW, targetH);
-      ctx.rotate(Math.PI);
-      ctx.drawImage(img, 0, 0, targetW, targetH);
-      break;
-    case 4:
-      // Flip vertical
-      ctx.translate(0, targetH);
-      ctx.scale(1, -1);
-      ctx.drawImage(img, 0, 0, targetW, targetH);
-      break;
-    case 5:
-      // Rotate 90° CW + Flip horizontal
-      // raw: W×H → corrected: H×W
-      ctx.translate(targetW, 0);
-      ctx.rotate(Math.PI / 2);
-      ctx.scale(1, -1);
-      ctx.drawImage(img, 0, 0, targetH, targetW); // draw in raw dims
-      break;
-    case 6:
-      // Rotate 90° CW (most common iPhone portrait)
-      // raw: W×H (landscape) → corrected: H×W (portrait)
-      ctx.translate(targetW, 0);
-      ctx.rotate(Math.PI / 2);
-      ctx.drawImage(img, 0, 0, targetH, targetW); // draw in raw dims
-      break;
-    case 7:
-      // Rotate 90° CCW + Flip horizontal
-      ctx.translate(0, targetH);
-      ctx.rotate(-Math.PI / 2);
-      ctx.scale(1, -1);
-      ctx.drawImage(img, 0, 0, targetH, targetW);
-      break;
-    case 8:
-      // Rotate 90° CCW
-      // raw: W×H (landscape) → corrected: H×W (portrait)
-      ctx.translate(0, targetH);
-      ctx.rotate(-Math.PI / 2);
-      ctx.drawImage(img, 0, 0, targetH, targetW); // draw in raw dims
-      break;
-    default:
-      // No rotation needed (orientation 1)
-      ctx.drawImage(img, 0, 0, targetW, targetH);
-      break;
-  }
-  ctx.restore();
-}
-
-// Get corrected dimensions based on EXIF orientation
-function getCorrectedDims(naturalW, naturalH, orientation) {
-  if (orientation >= 5 && orientation <= 8) {
-    return { w: naturalH, h: naturalW }; // swap for 90°/270° rotations
-  }
-  return { w: naturalW, h: naturalH };
-}
-
-// ══════════════════════════════════════
-//  TOGGLE PREP OPTIONS
-// ══════════════════════════════════════
 function togglePrep(key) {
   prepOpts[key] = !prepOpts[key];
   document.getElementById('tg-' + key).classList.toggle('on', prepOpts[key]);
@@ -414,8 +299,7 @@ document.getElementById('btnCD').onclick = function() {
   inCam = false; document.getElementById('cbar').classList.remove('on');
 };
 document.getElementById('fileInput').onchange = function() {
-  var f = Array.prototype.slice.call(this.files);
-  if (f.length) handleFiles(f, null);
+  handleFiles(Array.prototype.slice.call(this.files), null);
 };
 document.getElementById('cameraInput').onchange = function() {
   var f = Array.prototype.slice.call(this.files);
@@ -434,49 +318,44 @@ uc.addEventListener('dragover',  function(e){ e.preventDefault(); uc.style.borde
 uc.addEventListener('dragleave', function(e){ if (!uc.contains(e.relatedTarget)) uc.style.borderColor=''; });
 uc.addEventListener('drop', function(e) {
   e.preventDefault(); uc.style.borderColor='';
-  var f = Array.prototype.slice.call(e.dataTransfer.files).filter(function(x){return x.type.startsWith('image/');});
+  var f = Array.prototype.slice.call(e.dataTransfer.files).filter(function(x){ return x.type.startsWith('image/'); });
   if (f.length) handleFiles(f, null);
 });
 
 // ══════════════════════════════════════
-//  HANDLE FILES — reads EXIF before dataURL
+//  HANDLE FILES
+//  naturalWidth/naturalHeight = already EXIF-corrected by browser
 // ══════════════════════════════════════
 function handleFiles(files, cb) {
   var imgs = files.filter(function(f){ return f.type.startsWith('image/'); });
   if (!imgs.length) return;
   var done = 0;
   imgs.forEach(function(file) {
-    // Step 1: read as ArrayBuffer to extract EXIF orientation
-    var arReader = new FileReader();
-    arReader.onload = function(e1) {
-      var orientation = getExifOrientation(e1.target.result);
-      // Step 2: read as dataURL for display and processing
-      var drReader = new FileReader();
-      drReader.onload = function(e2) {
-        var dataUrl = e2.target.result;
-        // Step 3: get raw image dimensions, then compute corrected dims
-        var imgEl = new Image();
-        imgEl.onload = function() {
-          var corrected = getCorrectedDims(imgEl.naturalWidth, imgEl.naturalHeight, orientation);
-          images.push({
-            dataUrl:     dataUrl,
-            mime:        file.type || 'image/jpeg',
-            w:           corrected.w,   // corrected width (after rotation)
-            h:           corrected.h,   // corrected height
-            rawW:        imgEl.naturalWidth,
-            rawH:        imgEl.naturalHeight,
-            isLand:      corrected.w > corrected.h,
-            orientation: orientation
-          });
-          done++;
-          if (done === imgs.length) { renderGrid(); if(cb) cb(); }
-        };
-        imgEl.onerror = function() { done++; if (done === imgs.length) { renderGrid(); if(cb) cb(); } };
-        imgEl.src = dataUrl;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var dataUrl = e.target.result;
+      var imgEl = new Image();
+      imgEl.onload = function() {
+        // naturalWidth/naturalHeight are already EXIF-corrected in modern browsers
+        var w = imgEl.naturalWidth;
+        var h = imgEl.naturalHeight;
+        images.push({
+          dataUrl: dataUrl,
+          mime:    file.type || 'image/jpeg',
+          w:       w,
+          h:       h,
+          isLand:  w > h
+        });
+        done++;
+        if (done === imgs.length) { renderGrid(); if (cb) cb(); }
       };
-      drReader.readAsDataURL(file);
+      imgEl.onerror = function() {
+        done++;
+        if (done === imgs.length) { renderGrid(); if (cb) cb(); }
+      };
+      imgEl.src = dataUrl;
     };
-    arReader.readAsArrayBuffer(file);
+    reader.readAsDataURL(file);
   });
 }
 
@@ -492,14 +371,11 @@ function renderGrid() {
     var d=document.createElement('div');
     d.className='ith'+(im.isLand?' land':'');
     d.id='th'+i;
-    var exifTag = im.orientation !== 1
-      ? '<div class="exif-badge">EXIF '+im.orientation+'</div>'
-      : '';
-    d.innerHTML='<img src="'+im.dataUrl+'" alt="p'+(i+1)+'" loading="lazy" style="transform:'+exifRotationCSS(im.orientation)+';transform-origin:center;object-fit:cover;">'
+    // No CSS transform needed — browser auto-applies EXIF to <img> display
+    d.innerHTML='<img src="'+im.dataUrl+'" alt="p'+(i+1)+'" loading="lazy">'
       +'<button class="rm" onclick="removeImg('+i+')">✕</button>'
       +'<div class="pg">p.'+(i+1)+'</div>'
       +'<div class="ori">'+(im.isLand?'↔':'↕')+'</div>'
-      +exifTag
       +'<div class="spin">⏳</div>'
       +'<div class="ok-overlay">✓</div>';
     g.appendChild(d);
@@ -508,80 +384,62 @@ function renderGrid() {
   hideErr();
 }
 
-// CSS transform for thumbnail preview (so thumb looks correct)
-function exifRotationCSS(o) {
-  switch(o) {
-    case 2: return 'scaleX(-1)';
-    case 3: return 'rotate(180deg)';
-    case 4: return 'scaleY(-1)';
-    case 5: return 'rotate(90deg) scaleX(-1)';
-    case 6: return 'rotate(90deg)';
-    case 7: return 'rotate(-90deg) scaleX(-1)';
-    case 8: return 'rotate(-90deg)';
-    default: return 'none';
-  }
-}
-
 function setThumb(i, state) {
   var el=document.getElementById('th'+i);
   if (!el) return;
   el.classList.remove('processing','done');
   if (state) el.classList.add(state);
 }
-function removeImg(i){images.splice(i,1);if(!images.length){inCam=false;document.getElementById('cbar').classList.remove('on');}renderGrid();}
-function clearAll(){images=[];inCam=false;document.getElementById('cbar').classList.remove('on');renderGrid();}
+function removeImg(i){ images.splice(i,1); if(!images.length){ inCam=false; document.getElementById('cbar').classList.remove('on'); } renderGrid(); }
+function clearAll(){ images=[]; inCam=false; document.getElementById('cbar').classList.remove('on'); renderGrid(); }
 
 // ══════════════════════════════════════
 //  LOG / PROGRESS
 // ══════════════════════════════════════
 function log(msg,type){
   var el=document.getElementById('plog');
-  var d=new Date();var ts=p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());
-  var div=document.createElement('div');div.className='ll';
+  var d=new Date(); var ts=p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());
+  var div=document.createElement('div'); div.className='ll';
   div.innerHTML='<span class="lts">['+ts+']</span><span class="lm '+(type||'')+'">'+msg+'</span>';
-  el.appendChild(div);el.scrollTop=el.scrollHeight;
+  el.appendChild(div); el.scrollTop=el.scrollHeight;
 }
-function p2(n){return n<10?'0'+n:n;}
-function setBar(pct,lbl){document.getElementById('bf').style.width=pct+'%';document.getElementById('bl').textContent=lbl;}
-function showErr(m){var e=document.getElementById('errb');e.textContent=m;e.classList.add('on');}
-function hideErr(){document.getElementById('errb').classList.remove('on');}
+function p2(n){ return n<10?'0'+n:n; }
+function setBar(pct,lbl){ document.getElementById('bf').style.width=pct+'%'; document.getElementById('bl').textContent=lbl; }
+function showErr(m){ var e=document.getElementById('errb'); e.textContent=m; e.classList.add('on'); }
+function hideErr(){ document.getElementById('errb').classList.remove('on'); }
 
 // ══════════════════════════════════════
-//  IMAGE PREPROCESSING (Canvas)
-//  NOW WITH EXIF ROTATION CORRECTION
+//  IMAGE PREPROCESSING
+//  ctx.drawImage(img) uses browser-corrected (EXIF-applied) pixels.
+//  We do NOT need any manual rotation here.
 // ══════════════════════════════════════
 function preprocessImage(imgData, opts) {
   return new Promise(function(resolve) {
     var img = new Image();
     img.onload = function() {
-      var rawW = img.naturalWidth;
-      var rawH = img.naturalHeight;
-      var orientation = imgData.orientation || 1;
+      // naturalWidth/naturalHeight are EXIF-corrected by browser
+      var W = img.naturalWidth;
+      var H = img.naturalHeight;
 
-      // Corrected dimensions (after applying EXIF rotation)
-      var corrDims = getCorrectedDims(rawW, rawH, orientation);
-      var corrW = corrDims.w;
-      var corrH = corrDims.h;
+      // Scale up for better OCR
+      var scale = Math.min(3, Math.max(1, 2400 / Math.max(W, H)));
+      var cW = Math.round(W * scale);
+      var cH = Math.round(H * scale);
 
-      // Scale up small images for better OCR (max 2400px on longest side)
-      var scale = Math.min(3, Math.max(1, 2400 / Math.max(corrW, corrH)));
-      var cW = Math.round(corrW * scale);
-      var cH = Math.round(corrH * scale);
-
-      offCanvas.width  = cW;
-      offCanvas.height = cH;
-      var ctx = offCanvas.getContext('2d');
+      var canvas = document.createElement('canvas');
+      canvas.width  = cW;
+      canvas.height = cH;
+      var ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      // ── DRAW WITH EXIF CORRECTION ──────────
-      drawWithExifCorrection(ctx, img, orientation, cW, cH);
-      // ──────────────────────────────────────
+      // Simple draw — browser already applied EXIF orientation
+      ctx.drawImage(img, 0, 0, cW, cH);
 
       var imgPixels = ctx.getImageData(0, 0, cW, cH);
       var d = imgPixels.data;
 
-      // Step 1: Grayscale
+      // Grayscale
       if (opts.gray || opts.contrast || opts.sharp || opts.thresh) {
         for (var i=0; i<d.length; i+=4) {
           var g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
@@ -589,7 +447,7 @@ function preprocessImage(imgData, opts) {
         }
       }
 
-      // Step 2: Contrast boost
+      // Contrast boost
       if (opts.contrast) {
         var mn=255, mx=0;
         for (var i=0; i<d.length; i+=4) { if(d[i]<mn)mn=d[i]; if(d[i]>mx)mx=d[i]; }
@@ -604,17 +462,15 @@ function preprocessImage(imgData, opts) {
         }
       }
 
-      // Step 3: Unsharp mask (sharpen)
+      // Sharpen
       if (opts.sharp) {
         var src = new Uint8ClampedArray(d);
         var kernel = [0,-1,0,-1,5,-1,0,-1,0];
         for (var y=1; y<cH-1; y++) {
           for (var x=1; x<cW-1; x++) {
-            var idx=(y*cW+x)*4;
-            var v=0;
+            var idx=(y*cW+x)*4, v=0;
             for (var ky=0; ky<3; ky++) for (var kx=0; kx<3; kx++) {
-              var si=((y+ky-1)*cW+(x+kx-1))*4;
-              v+=src[si]*kernel[ky*3+kx];
+              v += src[((y+ky-1)*cW+(x+kx-1))*4] * kernel[ky*3+kx];
             }
             var sv=Math.max(0,Math.min(255,v));
             d[idx]=d[idx+1]=d[idx+2]=sv;
@@ -622,7 +478,7 @@ function preprocessImage(imgData, opts) {
         }
       }
 
-      // Step 4: Hard threshold (Otsu)
+      // Binarize (Otsu)
       if (opts.thresh) {
         var hist=new Array(256).fill(0);
         for (var i=0;i<d.length;i+=4) hist[d[i]]++;
@@ -634,8 +490,8 @@ function preprocessImage(imgData, opts) {
           wF=total-wB; if(!wF) break;
           sumB+=t*hist[t];
           var mB=sumB/wB, mF=(sum-sumB)/wF;
-          var v=wB*wF*(mB-mF)*(mB-mF);
-          if(v>maxVar){maxVar=v;thresh=t;}
+          var vv=wB*wF*(mB-mF)*(mB-mF);
+          if(vv>maxVar){maxVar=vv;thresh=t;}
         }
         for (var i=0;i<d.length;i+=4){
           var bw=d[i]>thresh?255:0;
@@ -644,7 +500,8 @@ function preprocessImage(imgData, opts) {
       }
 
       ctx.putImageData(imgPixels, 0, 0);
-      resolve(offCanvas.toDataURL('image/png'));
+      // Return both the processed URL and the canvas dimensions
+      resolve({ url: canvas.toDataURL('image/png'), cW: cW, cH: cH });
     };
     img.src = imgData.dataUrl;
   });
@@ -653,8 +510,8 @@ function preprocessImage(imgData, opts) {
 // ══════════════════════════════════════
 //  OCR — Tesseract word-level bbox
 // ══════════════════════════════════════
-function runOCR(processedUrl, pageIdx, total) {
-  return Tesseract.recognize(processedUrl, 'spa', {
+function runOCR(procResult, pageIdx, total) {
+  return Tesseract.recognize(procResult.url, 'spa', {
     logger: function(m) {
       if (m.status === 'recognizing text') {
         var base = (pageIdx / total) * 85;
@@ -668,31 +525,56 @@ function runOCR(processedUrl, pageIdx, total) {
     var data = result.data;
 
     if (data.words && data.words.length) {
-      var procW = offCanvas.width;
-      var procH = offCanvas.height;
+      var procW = procResult.cW;
+      var procH = procResult.cH;
 
       data.words.forEach(function(w) {
         if (!w.text || !w.text.trim() || w.confidence < 25) return;
         var clean = w.text.replace(/[^\x20-\x7EáéíóúÁÉÍÓÚüÜñÑ¿¡«»\-]/g, '').trim();
-        if (!clean || clean.length < 1) return;
+        if (!clean) return;
         words.push({
           text: clean,
-          x0:  w.bbox.x0 / procW,
-          y0:  w.bbox.y0 / procH,
-          x1:  w.bbox.x1 / procW,
-          y1:  w.bbox.y1 / procH,
+          x0: w.bbox.x0 / procW,
+          y0: w.bbox.y0 / procH,
+          x1: w.bbox.x1 / procW,
+          y1: w.bbox.y1 / procH,
           conf: w.confidence
         });
         totalConf += w.confidence;
         wCount++;
       });
     }
+    return { words: words, avgConf: wCount > 0 ? Math.round(totalConf/wCount) : 0, count: wCount };
+  });
+}
 
-    return {
-      words:   words,
-      avgConf: wCount > 0 ? Math.round(totalConf / wCount) : 0,
-      count:   wCount
+// ══════════════════════════════════════
+//  GET CORRECTED IMAGE DATAURL FOR PDF
+//  Uses canvas + drawImage so browser applies EXIF.
+//  Output is a clean, correctly-oriented JPEG.
+// ══════════════════════════════════════
+function getOrientedDataUrl(imgData) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() {
+      // naturalWidth/naturalHeight already EXIF-corrected
+      var W = img.naturalWidth;
+      var H = img.naturalHeight;
+      // Downscale for PDF (max 1800px for file size)
+      var scale = Math.min(1, 1800 / Math.max(W, H));
+      var cW = Math.round(W * scale);
+      var cH = Math.round(H * scale);
+
+      var canvas = document.createElement('canvas');
+      canvas.width  = cW;
+      canvas.height = cH;
+      var ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, cW, cH); // browser applies EXIF
+      resolve(canvas.toDataURL('image/jpeg', 0.88));
     };
+    img.src = imgData.dataUrl;
   });
 }
 
@@ -717,10 +599,8 @@ function startProcess() {
   document.getElementById('statsBox').classList.remove('on');
   document.getElementById('dls').classList.remove('on');
 
-  var exifFixed = images.filter(function(im){ return im.orientation !== 1; }).length;
-  log('Inicio · '+images.length+' pág. · Tesseract spa · bbox posicional','act');
+  log('Inicio · '+images.length+' pág. · Tesseract spa · PSM 1 · bbox posicional','act');
   log('Preprocesado: '+Object.keys(prepOpts).filter(function(k){return prepOpts[k];}).join(', '));
-  if (exifFixed) log('📱 '+exifFixed+' imagen(es) con corrección EXIF aplicada','warn');
   log(materia+' · Unidad '+unidad+' · "'+titulo+'"');
 
   var total=images.length, totalW=0, totalConf=0, confPg=0;
@@ -730,11 +610,10 @@ function startProcess() {
   images.forEach(function(img,i) {
     chain = chain.then(function() {
       setThumb(i,'processing');
-      var exifNote = img.orientation !== 1 ? ' [EXIF→'+img.orientation+']' : '';
-      log('→ Preprocesando pág. '+(i+1)+exifNote+'...','act');
-      return preprocessImage(img, prepOpts).then(function(processedUrl) {
+      log('→ Preprocesando pág. '+(i+1)+'...','act');
+      return preprocessImage(img, prepOpts).then(function(procResult) {
         log('→ OCR pág. '+(i+1)+'/'+total+'...','act');
-        return runOCR(processedUrl, i, total);
+        return runOCR(procResult, i, total);
       }).then(function(ocrData) {
         totalW    += ocrData.count;
         totalConf += ocrData.avgConf;
@@ -753,97 +632,90 @@ function startProcess() {
 
   chain.then(function() {
     setBar(91,'Construyendo PDF...');
-    log('→ Generando PDF con texto en posición exacta...','act');
+    log('→ Generando PDF con orientación correcta...','act');
 
-    var jspdf=window.jspdf;
-    var doc=null;
-
-    docPages.forEach(function(page,i) {
-      var im=page.img;
-      // Use corrected dimensions for orientation
-      var orient=im.isLand?'landscape':'portrait';
-      var PW=im.isLand?297:210, PH=im.isLand?210:297;
-
-      if (i===0) {
-        doc=new jspdf.jsPDF({orientation:orient,unit:'mm',format:'a4'});
-      } else {
-        doc.addPage('a4',orient);
-      }
-
-      // For the PDF image, we need a pre-rotated version
-      // We'll use a temp canvas to get the corrected image dataUrl
-      var tmpCanvas = document.createElement('canvas');
-      var corrW = im.w, corrH = im.h;
-      var scale = Math.min(1, 1800 / Math.max(corrW, corrH)); // smaller for PDF size
-      tmpCanvas.width  = Math.round(corrW * scale);
-      tmpCanvas.height = Math.round(corrH * scale);
-      var tmpCtx = tmpCanvas.getContext('2d');
-
-      var tmpImg = new Image();
-      tmpImg.src = im.dataUrl;
-      drawWithExifCorrection(tmpCtx, tmpImg, im.orientation, tmpCanvas.width, tmpCanvas.height);
-      var correctedDataUrl = tmpCanvas.toDataURL('image/jpeg', 0.88);
-
-      var ratio=Math.min(PW/corrW, PH/corrH);
-      var iw=corrW*ratio, ih=corrH*ratio;
-      var ix=(PW-iw)/2, iy=(PH-ih)/2;
-
-      doc.addImage(correctedDataUrl,'JPEG',ix,iy,iw,ih,undefined,'FAST');
-
-      // Text layer
-      if (page.ocr.words.length > 0) {
-        page.ocr.words.forEach(function(w) {
-          var xMm = ix + w.x0 * iw;
-          var yMm = iy + w.y1 * ih;
-          var hMm = (w.y1 - w.y0) * ih;
-          var ptSz = Math.max(3.5, Math.min(36, hMm / 0.353));
-          doc.setFontSize(ptSz);
-          doc.setFont('helvetica','normal');
-          try {
-            doc.text(w.text+' ', xMm, yMm, {renderingMode:'invisible'});
-          } catch(ex) {
-            doc.setTextColor(255,255,255); doc.setFontSize(0.1);
-            doc.text(w.text+' ', xMm, yMm);
-            doc.setFontSize(ptSz); doc.setTextColor(0,0,0);
-          }
-        });
-      }
+    // Get corrected image dataUrls for all pages
+    var orientedPromises = docPages.map(function(page) {
+      return getOrientedDataUrl(page.img);
     });
 
-    doc.setProperties({
-      title:   materia+' - Unidad '+unidad+' - '+titulo,
-      subject: materia,
-      keywords:materia+', Unidad '+unidad+', OCR, Psicoanálisis',
-      creator: 'NeuroscanOCR v7 · Local · EXIF',
-      author:  materia
+    return Promise.all(orientedPromises).then(function(orientedUrls) {
+      var jspdf = window.jspdf;
+      var doc = null;
+
+      docPages.forEach(function(page, i) {
+        var im = page.img;
+        // im.w and im.h are already corrected (browser applied EXIF to naturalWidth/Height)
+        var orient = im.isLand ? 'landscape' : 'portrait';
+        var PW = im.isLand ? 297 : 210;
+        var PH = im.isLand ? 210 : 297;
+
+        if (i === 0) {
+          doc = new jspdf.jsPDF({orientation: orient, unit: 'mm', format: 'a4'});
+        } else {
+          doc.addPage('a4', orient);
+        }
+
+        var ratio = Math.min(PW/im.w, PH/im.h);
+        var iw = im.w * ratio, ih = im.h * ratio;
+        var ix = (PW-iw)/2, iy = (PH-ih)/2;
+
+        // orientedUrls[i] is already correctly oriented (browser handled EXIF in canvas)
+        doc.addImage(orientedUrls[i], 'JPEG', ix, iy, iw, ih, undefined, 'FAST');
+
+        // Invisible text layer
+        if (page.ocr.words.length > 0) {
+          page.ocr.words.forEach(function(w) {
+            var xMm = ix + w.x0 * iw;
+            var yMm = iy + w.y1 * ih;
+            var hMm = (w.y1 - w.y0) * ih;
+            var ptSz = Math.max(3.5, Math.min(36, hMm / 0.353));
+            doc.setFontSize(ptSz);
+            doc.setFont('helvetica','normal');
+            try {
+              doc.text(w.text+' ', xMm, yMm, {renderingMode:'invisible'});
+            } catch(ex) {
+              doc.setTextColor(255,255,255); doc.setFontSize(0.1);
+              doc.text(w.text+' ', xMm, yMm);
+              doc.setFontSize(ptSz); doc.setTextColor(0,0,0);
+            }
+          });
+        }
+      });
+
+      doc.setProperties({
+        title:   materia+' - Unidad '+unidad+' - '+titulo,
+        subject: materia,
+        keywords:materia+', Unidad '+unidad+', OCR',
+        creator: 'NeuroscanOCR v8 · Local',
+        author:  materia
+      });
+
+      setBar(99,'Compilando...');
+      pdfBlob = doc.output('blob');
+      setBar(100,'¡Completado!');
+
+      var avgC = confPg>0 ? Math.round(totalConf/confPg) : 0;
+      var vC = docPages.filter(function(p){return !p.img.isLand;}).length;
+      var lC = docPages.length - vC;
+
+      document.getElementById('stP').textContent=total+' páginas';
+      document.getElementById('stP').className='sv hi';
+      document.getElementById('stW').textContent=totalW.toLocaleString('es')+' palabras';
+      document.getElementById('stW').className='sv '+(totalW>200?'hi':totalW>50?'mid':'lo');
+      document.getElementById('stC').textContent=avgC+'%';
+      document.getElementById('stC').className='sv '+(avgC>=70?'hi':avgC>=45?'mid':'lo');
+      document.getElementById('stO').textContent=(vC?vC+'↕ vert.':'')+(vC&&lC?' + ':'')+(lC?lC+'↔ horiz.':'');
+      document.getElementById('stO').className='sv def';
+      document.getElementById('statsBox').classList.add('on');
+
+      log('✓ '+total+' págs. · '+totalW+' palabras · conf. '+avgC+'%','ok');
+      log('✓ "'+pdfFname+'" listo para descargar','ok');
+
+      document.getElementById('dlf').textContent=pdfFname;
+      document.getElementById('dls').classList.add('on');
+      document.getElementById('dlBtn').onclick=downloadPDF;
     });
-
-    setBar(99,'Compilando...');
-    pdfBlob=doc.output('blob');
-    setBar(100,'¡Completado!');
-
-    var avgC=confPg>0?Math.round(totalConf/confPg):0;
-    var vC=docPages.filter(function(p){return !p.img.isLand;}).length;
-    var lC=docPages.length-vC;
-    var exifCnt=images.filter(function(im){return im.orientation!==1;}).length;
-
-    document.getElementById('stP').textContent=total+' páginas';
-    document.getElementById('stP').className='sv hi';
-    document.getElementById('stW').textContent=totalW.toLocaleString('es')+' palabras';
-    document.getElementById('stW').className='sv '+(totalW>200?'hi':totalW>50?'mid':'lo');
-    document.getElementById('stC').textContent=avgC+'%';
-    document.getElementById('stC').className='sv '+(avgC>=70?'hi':avgC>=45?'mid':'lo');
-    document.getElementById('stO').textContent=(vC?vC+'↕ vert.':'')+(vC&&lC?' + ':'')+(lC?lC+'↔ horiz.':'');
-    document.getElementById('stO').className='sv def';
-    document.getElementById('stE').textContent=exifCnt ? exifCnt+' corregida(s) ✓' : 'ninguna necesaria';
-    document.getElementById('stE').className='sv '+(exifCnt?'mid':'hi');
-
-    log('✓ '+total+' págs. · '+totalW+' palabras · conf. '+avgC+'%','ok');
-    log('✓ "'+pdfFname+'" listo para descargar','ok');
-
-    document.getElementById('dlf').textContent=pdfFname;
-    document.getElementById('dls').classList.add('on');
-    document.getElementById('dlBtn').onclick=downloadPDF;
 
   }).catch(function(err){
     log('✗ Error: '+err.message,'err');
@@ -857,14 +729,14 @@ function startProcess() {
 //  DOWNLOAD / RESET
 // ══════════════════════════════════════
 function downloadPDF(){
-  if(!pdfBlob)return;
+  if(!pdfBlob) return;
   var url=URL.createObjectURL(pdfBlob);
   var a=document.createElement('a'); a.href=url; a.download=pdfFname;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(function(){URL.revokeObjectURL(url);},1500);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
 }
 function resetAll(){
-  images=[];pdfBlob=null;pdfFname='';inCam=false;
+  images=[]; pdfBlob=null; pdfFname=''; inCam=false;
   document.getElementById('progS').classList.remove('on');
   document.getElementById('dls').classList.remove('on');
   document.getElementById('statsBox').classList.remove('on');
@@ -873,7 +745,7 @@ function resetAll(){
   document.getElementById('cbar').classList.remove('on');
   document.getElementById('fileInput').value='';
   document.getElementById('cameraInput').value='';
-  hideErr();renderGrid();
+  hideErr(); renderGrid();
 }
 document.getElementById('procBtn').disabled=true;
 </script>
