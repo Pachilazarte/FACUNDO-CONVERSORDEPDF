@@ -227,6 +227,58 @@ textarea::placeholder{color:var(--dim);font-weight:400;}
     <div class="ep ep3">📄 PDF descargable</div>
   </div>
 
+
+          <div class="card" style="border-color: var(--purple);">
+    <div class="ch"><div class="sn" style="background: var(--purple);">0</div>
+        <div><div class="ct">Prompt de Configuración</div>
+        <div class="cs">Copia el prompt para usar en la IA</div></div>
+    </div>
+    <button class="btn-rst" style="border-color: var(--purple); color: var(--purple); margin-top: 0;" onclick="openPrompt()">👁️ VER PROMPT</button>
+</div>
+
+<div id="promptModal" style="display:none; position:fixed; inset:0; background:rgba(2,5,16,0.95); z-index:100; padding:20px; align-items:center; justify-content:center;">
+    <div class="card" style="max-width:600px; width:100%; max-height:80vh; overflow-y:auto; border-color:var(--cyan);">
+        <div class="prev-hdr">
+            <div class="prev-title">Instrucciones de la IA</div>
+            <button class="btn-prev-tog" onclick="closePrompt()">Cerrar</button>
+</div>
+        <textarea id="promptText" readonly style="min-height:350px; margin-bottom:15px; background:rgba(0,0,0,0.4); font-size: 0.7rem; line-height: 1.5; color: #a5d8ff;"># INSTRUCCIONES PARA PROCESAMIENTO DE TEXTO ACADÉMICO
+
+Actúa como un experto en transcrpción y análisis de textos universitarios. Tu objetivo es transformar el material proporcionado (PDF, Word o escaneado) en una guía de estudio de máxima densidad y fidelidad.
+
+## 1. INSTRUCCIONES DE CONTENIDO
+Empezá con una introducción desarrollada que explique cómo inicia el texto y cuál es la idea central. Cada vez que aparezca un título o subtítulo importante, ponelo igual que en el texto como encabezado. Debajo, escribí un resumen fiel de lo que desarrolla ese apartado, usando palabras textuales o lo más cercanas al original. Respetá el orden temático del texto, de principio a fin. No inventes, no interpretes ni agregues información externa: solo usá lo que esté en el texto. La idea es que el material final sea como una guía de estudio narrativa y ordenada, donde quede claro qué trata cada parte, con definiciones exactas para poder escribirlas en un examen.
+
+De esta forma, el resumen debe arrancar con: 
+- Introducción (extensa, explicando de qué habla el texto en general).
+- Título/Subtítulo (tal cual aparece en el original).
+- Explicación fiel, desarrollada y extensa de cada punto.
+- Siguiente tema/subtema con su desarrollo detallado… y así hasta el final.
+
+## 2. REGLAS DE EXTENSIÓN Y LIMPIEZA
+- **PROHIBICIÓN DE CITAS:** No utilices etiquetas de citas, números de página ni corchetes del tipo. El texto debe ser limpio y fluido.
+- **MÁXIMA DENSIDAD:** Si el texto original es extenso, el resumen debe ser igualmente denso. No resumas conceptos clave en una sola oración; explica los fundamentos y los matices para que la guía sea autosuficiente para el estudio.
+- **FIDELIDAD TEXTUAL:** Mantén las definiciones técnicas y el vocabulario específico del autor.
+
+## 3. FORMATO DE SALIDA (JERARQUÍA MARKDOWN)
+Debes estructurar el contenido utilizando exclusivamente la siguiente jerarquía para asegurar la conversión posterior a PDF:
+
+- `#` → Título principal (Mayúsculas y Negrita).
+- `##` → Secciones principales / Introducción (Negrita).
+- `###` → Subtítulos (Negrita).
+- `**Negrita**` → Para resaltar conceptos clave dentro de los párrafos.
+- `*Texto en cursiva*` → Para definiciones exactas o citas textuales del autor.
+- `•` → Listas de primer nivel.
+- `◦` → Sublistas (manteniendo la sangría).
+
+## 4. RESTRICCIÓN DE ENTREGA
+- **SÓLO CÓDIGO:** Entrega el contenido EXCLUSIVAMENTE dentro de un bloque de código (Markdown/MD/TXT). 
+- **SIN CHAT:** No incluyas saludos, introducciones ni comentarios por parte de la IA (prohibido frases como "Aquí tienes tu resumen"). El texto debe comenzar directamente con el primer encabezado.</textarea>
+        <button class="btn-proc" id="copyBtn" onclick="copyPrompt()" style="background: linear-gradient(135deg, var(--purple), #5a189a);">📋 COPIAR AL PORTAPAPELES</button>
+    </div>
+</div>
+
+
   <!-- 01 Identificación -->
   <div class="card">
     <div class="ch"><div class="sn">01</div>
@@ -981,6 +1033,44 @@ function resetAll() {
   document.getElementById('procBtn').disabled = false;
   hideErr();
 }
+
+
+// ═══════════════════════════════════════
+//  PROMPT MODAL & COPY
+// ═══════════════════════════════════════
+function openPrompt() {
+    document.getElementById('promptModal').style.display = 'flex';
+}
+
+function closePrompt() {
+    document.getElementById('promptModal').style.display = 'none';
+}
+
+function copyPrompt() {
+    var copyText = document.getElementById("promptText");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // Para móviles
+    navigator.clipboard.writeText(copyText.value);
+    
+    var btn = document.getElementById("copyBtn");
+    var originalText = btn.innerHTML;
+    btn.innerHTML = "✅ ¡COPIADO!";
+    btn.style.background = "var(--green)";
+    
+    setTimeout(function() {
+        btn.innerHTML = originalText;
+        btn.style.background = "linear-gradient(135deg,var(--cyan),var(--purple))";
+    }, 2000);
+}
+
+// Cerrar modal si se hace clic fuera de la tarjeta
+window.onclick = function(event) {
+    var modal = document.getElementById('promptModal');
+    if (event.target == modal) {
+        closePrompt();
+    }
+}
+
 </script>
 </body>
 </html>
