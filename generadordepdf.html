@@ -213,9 +213,8 @@ textarea::placeholder{color:var(--dim);font-weight:400;}
 <div class="wrap">
   <div class="nav-container">
     <a href="index.html" class="btn-capsule">← VOLVER AL INICIO</a>
-    
     <div class="btn-capsule active">
-      <div class="pdot-nav"></div> NEUROSCAN · APUNTES · v1
+      <div class="pdot-nav"></div> NEUROSCAN · APUNTES · v2
     </div>
   </div>
 
@@ -227,29 +226,29 @@ textarea::placeholder{color:var(--dim);font-weight:400;}
     <div class="ep ep3">📄 PDF descargable</div>
   </div>
 
-
-          <div class="card" style="border-color: var(--purple);">
+  <!-- 00 Prompt -->
+  <div class="card" style="border-color: var(--purple);">
     <div class="ch"><div class="sn" style="background: var(--purple);">0</div>
         <div><div class="ct">Prompt de Configuración</div>
         <div class="cs">Copia el prompt para usar en la IA</div></div>
     </div>
     <button class="btn-rst" style="border-color: var(--purple); color: var(--purple); margin-top: 0;" onclick="openPrompt()">👁️ VER PROMPT</button>
-</div>
+  </div>
 
-<div id="promptModal" style="display:none; position:fixed; inset:0; background:rgba(2,5,16,0.95); z-index:100; padding:20px; align-items:center; justify-content:center;">
+  <div id="promptModal" style="display:none; position:fixed; inset:0; background:rgba(2,5,16,0.95); z-index:100; padding:20px; align-items:center; justify-content:center;">
     <div class="card" style="max-width:600px; width:100%; max-height:80vh; overflow-y:auto; border-color:var(--cyan);">
-        <div class="prev-hdr">
-            <div class="prev-title">Instrucciones de la IA</div>
-            <button class="btn-prev-tog" onclick="closePrompt()">Cerrar</button>
-</div>
-        <textarea id="promptText" readonly style="min-height:350px; margin-bottom:15px; background:rgba(0,0,0,0.4); font-size: 0.7rem; line-height: 1.5; color: #a5d8ff;"># INSTRUCCIONES PARA PROCESAMIENTO DE TEXTO ACADÉMICO
+      <div class="prev-hdr">
+        <div class="prev-title">Instrucciones de la IA</div>
+        <button class="btn-prev-tog" onclick="closePrompt()">Cerrar</button>
+      </div>
+      <textarea id="promptText" readonly style="min-height:350px; margin-bottom:15px; background:rgba(0,0,0,0.4); font-size: 0.7rem; line-height: 1.5; color: #a5d8ff;"># INSTRUCCIONES PARA PROCESAMIENTO DE TEXTO ACADÉMICO
 
-Actúa como un experto en transcrpción y análisis de textos universitarios. Tu objetivo es transformar el material proporcionado (PDF, Word o escaneado) en una guía de estudio de máxima densidad y fidelidad.
+Actúa como un experto en transcripción y análisis de textos universitarios. Tu objetivo es transformar el material proporcionado (PDF, Word o escaneado) en una guía de estudio de máxima densidad y fidelidad.
 
 ## 1. INSTRUCCIONES DE CONTENIDO
 Empezá con una introducción desarrollada que explique cómo inicia el texto y cuál es la idea central. Cada vez que aparezca un título o subtítulo importante, ponelo igual que en el texto como encabezado. Debajo, escribí un resumen fiel de lo que desarrolla ese apartado, usando palabras textuales o lo más cercanas al original. Respetá el orden temático del texto, de principio a fin. No inventes, no interpretes ni agregues información externa: solo usá lo que esté en el texto. La idea es que el material final sea como una guía de estudio narrativa y ordenada, donde quede claro qué trata cada parte, con definiciones exactas para poder escribirlas en un examen.
 
-De esta forma, el resumen debe arrancar con: 
+De esta forma, el resumen debe arrancar con:
 - Introducción (extensa, explicando de qué habla el texto en general).
 - Título/Subtítulo (tal cual aparece en el original).
 - Explicación fiel, desarrollada y extensa de cada punto.
@@ -272,12 +271,11 @@ Debes estructurar el contenido utilizando exclusivamente la siguiente jerarquía
 - `◦` → Sublistas (manteniendo la sangría).
 
 ## 4. RESTRICCIÓN DE ENTREGA
-- **SÓLO CÓDIGO:** Entrega el contenido EXCLUSIVAMENTE dentro de un bloque de código (Markdown/MD/TXT). 
+- **SÓLO CÓDIGO:** Entrega el contenido EXCLUSIVAMENTE dentro de un bloque de código (Markdown/MD/TXT).
 - **SIN CHAT:** No incluyas saludos, introducciones ni comentarios por parte de la IA (prohibido frases como "Aquí tienes tu resumen"). El texto debe comenzar directamente con el primer encabezado.</textarea>
-        <button class="btn-proc" id="copyBtn" onclick="copyPrompt()" style="background: linear-gradient(135deg, var(--purple), #5a189a);">📋 COPIAR AL PORTAPAPELES</button>
+      <button class="btn-proc" id="copyBtn" onclick="copyPrompt()" style="background: linear-gradient(135deg, var(--purple), #5a189a);">📋 COPIAR AL PORTAPAPELES</button>
     </div>
-</div>
-
+  </div>
 
   <!-- 01 Identificación -->
   <div class="card">
@@ -324,7 +322,6 @@ Debes estructurar el contenido utilizando exclusivamente la siguiente jerarquía
         <div class="cs">Formato Markdown académico</div></div>
     </div>
 
-    <!-- Syntax reference -->
     <div class="syn-hint">
       <div class="sh"><code>#</code> <span>Título principal</span></div>
       <div class="sh"><code>##</code> <span>Sección</span></div>
@@ -372,7 +369,6 @@ Texto de cuerpo normal aquí..."></textarea>
     </div>
     <input type="file" id="mdFileInput" accept=".txt,.md,text/plain">
 
-    <!-- Preview -->
     <div class="prev-wrap" id="prevWrap">
       <div class="prev-hdr">
         <div class="prev-title">🔍 Vista previa</div>
@@ -411,9 +407,10 @@ Texto de cuerpo normal aquí..."></textarea>
       <div>
         <label style="display:block;margin-bottom:7px;">Tamaño de fuente cuerpo</label>
         <div class="opt-row">
-          <div class="toggle-pill" id="fs-10" onclick="setFontSize(10)"><div class="tk"></div> 10 pt</div>
-          <div class="toggle-pill on" id="fs-11" onclick="setFontSize(11)"><div class="tk"></div> 11 pt</div>
-          <div class="toggle-pill" id="fs-12" onclick="setFontSize(12)"><div class="tk"></div> 12 pt</div>
+          <div class="toggle-pill on" id="fs-9"  onclick="setFontSize(9)"><div class="tk"></div> 9 pt</div>
+          <div class="toggle-pill"   id="fs-10" onclick="setFontSize(10)"><div class="tk"></div> 10 pt</div>
+          <div class="toggle-pill"   id="fs-11" onclick="setFontSize(11)"><div class="tk"></div> 11 pt</div>
+          <div class="toggle-pill"   id="fs-12" onclick="setFontSize(12)"><div class="tk"></div> 12 pt</div>
         </div>
       </div>
     </div>
@@ -423,7 +420,7 @@ Texto de cuerpo normal aquí..."></textarea>
   <div class="card">
     <div class="ch"><div class="sn">04</div>
       <div><div class="ct">Generar PDF</div>
-        <div class="cs">Layout A4 · márgenes universitarios · tipografía legible</div></div>
+        <div class="cs">Layout A4 · márgenes estrechos · Arial 9pt · interlineado 1</div></div>
     </div>
 
     <div class="prog-s" id="progS">
@@ -451,7 +448,7 @@ Texto de cuerpo normal aquí..."></textarea>
     </div>
   </div>
 
-  <div class="foot">NEUROSCAN APUNTES v1 · PDF ACADÉMICO A4 · JSPDF · 100% LOCAL</div>
+  <div class="foot">NEUROSCAN APUNTES v2 · PDF A4 · ARIAL 9pt · MÁRGENES ESTRECHOS · INTERLINEADO 1</div>
 </div>
 
 <script>
@@ -461,7 +458,7 @@ Texto de cuerpo normal aquí..."></textarea>
 var pdfBlob  = null;
 var pdfFname = '';
 var opts = { header: true, footer: true, nums: true, toc: false };
-var bodyFontSize = 11;
+var bodyFontSize = 9;   // ← Arial 9pt por defecto
 var prevVisible = false;
 
 // ═══════════════════════════════════════
@@ -473,7 +470,7 @@ function toggleOpt(key) {
 }
 function setFontSize(sz) {
   bodyFontSize = sz;
-  [10, 11, 12].forEach(function(s) {
+  [9, 10, 11, 12].forEach(function(s) {
     document.getElementById('fs-' + s).classList.toggle('on', s === sz);
   });
 }
@@ -573,52 +570,33 @@ function parseMarkdown(text) {
   lines.forEach(function(rawLine) {
     var line = rawLine.trimEnd();
 
-    // Title H1
     if (/^# /.test(line)) {
       tokens.push({ type: 'h1', text: line.slice(2).trim() });
       wordCount += line.split(/\s+/).length;
-
-    // Section H2
     } else if (/^## /.test(line)) {
       tokens.push({ type: 'h2', text: line.slice(3).trim() });
       secCount++;
       wordCount += line.split(/\s+/).length;
-
-    // Subsection H3
     } else if (/^### /.test(line)) {
       tokens.push({ type: 'h3', text: line.slice(4).trim() });
       wordCount += line.split(/\s+/).length;
-
-    // HR separator
     } else if (/^---+$/.test(line.trim())) {
       tokens.push({ type: 'hr' });
-
-    // Formula $$...$$
     } else if (/^\$\$.*\$\$$/.test(line.trim())) {
       var formula = line.trim().slice(2, -2).trim();
       tokens.push({ type: 'formula', text: formula });
       formulaCount++;
-
-    // Bullet level 2 ◦
     } else if (/^◦ /.test(line)) {
       tokens.push({ type: 'li2', text: line.slice(2).trim() });
       wordCount += line.split(/\s+/).length;
-
-    // Bullet level 1 • 
     } else if (/^• /.test(line)) {
       tokens.push({ type: 'li1', text: line.slice(2).trim() });
       wordCount += line.split(/\s+/).length;
-
-    // Bullet - or *
     } else if (/^[-*] /.test(line)) {
       tokens.push({ type: 'li1', text: line.slice(2).trim() });
       wordCount += line.split(/\s+/).length;
-
-    // Blank line
     } else if (!line.trim()) {
       tokens.push({ type: 'blank' });
-
-    // Body paragraph
     } else {
       tokens.push({ type: 'body', text: line });
       wordCount += line.split(/\s+/).length;
@@ -629,260 +607,245 @@ function parseMarkdown(text) {
 }
 
 // ═══════════════════════════════════════
-//  PDF BUILDER
+//  PDF BUILDER — Arial 9pt · Márgenes estrechos · Interlineado 1
 // ═══════════════════════════════════════
 function buildPDF(parsed, materia, unidad, titulo) {
   var jspdf = window.jspdf;
-  // A4 portrait
   var doc = new jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-  // Layout constants (mm)
+  // ── Layout A4 (mm) — márgenes estrechos ──────────────────
   var PW = 210, PH = 297;
-  var ML = 30,   // left margin (space for binding)
-      MR = 20,   // right margin
-      MT = 25,   // top margin
-      MB = 25;   // bottom margin
-  var TW = PW - ML - MR; // text width
+  var ML = 15,   // margen izquierdo estrecho
+      MR = 15,   // margen derecho estrecho
+      MT = 20,   // margen superior
+      MB = 18;   // margen inferior
+  var TW = PW - ML - MR;  // ancho de texto: 180mm
   var pageNum = 1;
 
-  // ── Colors ──────────────────────────────────────────────
+  // ── Colores ──────────────────────────────────────────────
   var C_BLACK  = [0, 0, 0];
-  var C_DARK   = [30, 30, 30];
-  var C_ACCENT = [0, 80, 160];   // deep blue for section headers
-  var C_SUB    = [70, 50, 130];  // purple-ish for H3
-  var C_DIM    = [100, 100, 110];
-  var C_RULE   = [180, 190, 200];
-  var C_FORM   = [140, 100, 0];  // gold for formulas
+  var C_DARK   = [20, 20, 20];
+  var C_ACCENT = [0, 70, 140];
+  var C_SUB    = [60, 40, 120];
+  var C_DIM    = [110, 110, 120];
+  var C_RULE   = [180, 190, 205];
+  var C_FORM   = [130, 90, 0];
 
-  // ── Font sizes ───────────────────────────────────────────
-  var FS_H1   = 16;
-  var FS_H2   = 14;
-  var FS_H3   = bodyFontSize + 1;
-  var FS_BODY = bodyFontSize;
+  // ── Tamaños de fuente ────────────────────────────────────
+  // H1: Arial Bold 12pt
+  // H2: Arial Bold 10pt
+  // H3: Arial Bold 10pt
+  // Cuerpo: Arial 9pt (bodyFontSize)
+  var FS_H1   = 12;
+  var FS_H2   = 10;
+  var FS_H3   = 10;
+  var FS_BODY = bodyFontSize;  // 9pt por defecto
   var FS_LI   = bodyFontSize;
-  var FS_HDR  = 8;
-  var FS_FORM = bodyFontSize + 0.5;
+  var FS_HDR  = 7;
+  var FS_FORM = bodyFontSize;
 
-  // ── Line heights (mm) ────────────────────────────────────
-  function lh(fs) { return fs * 0.353 * 1.45; }  // pt → mm * line spacing
+  // ── Interlineado 1 ───────────────────────────────────────
+  // factor 1.0 = interlineado simple exacto
+  function lh(fs) { return fs * 0.353 * 1.0; }
 
   var y = MT;
 
-  // ── Helpers ─────────────────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────────
   function setColor(arr) { doc.setTextColor(arr[0], arr[1], arr[2]); }
   function setDraw(arr)  { doc.setDrawColor(arr[0], arr[1], arr[2]); }
 
   function needSpace(needed) {
-    if (y + needed > PH - MB) {
-      addPage();
-      return true;
-    }
+    if (y + needed > PH - MB) { addPage(); return true; }
     return false;
   }
 
   function addPage() {
+    // Pie de página de la página actual
     if (opts.nums) {
-      // Page number at bottom
       doc.setFontSize(FS_HDR);
       doc.setFont('helvetica','normal');
       setColor(C_DIM);
-      doc.text(String(pageNum), PW / 2, PH - 10, { align: 'center' });
+      doc.text(String(pageNum), PW / 2, PH - 8, { align: 'center' });
     }
     if (opts.footer) {
       doc.setFontSize(FS_HDR - 0.5);
       doc.setFont('helvetica','italic');
       setColor(C_DIM);
-      doc.text(materia + ' · Unidad ' + unidad, ML, PH - 10);
-      doc.text(titulo, PW - MR, PH - 10, { align: 'right' });
+      doc.text(materia + ' · Unidad ' + unidad, ML, PH - 8);
+      doc.text(titulo, PW - MR, PH - 8, { align: 'right' });
     }
-
     doc.addPage('a4', 'portrait');
     pageNum++;
     y = MT;
-
-    if (opts.header) {
-      drawPageHeader();
-    }
+    if (opts.header) drawPageHeader();
   }
 
   function drawPageHeader() {
     doc.setFontSize(FS_HDR);
     doc.setFont('helvetica','normal');
     setColor(C_DIM);
-    doc.text(materia + ' · Unidad ' + unidad + ' · ' + titulo, ML, MT - 10);
+    doc.text(materia + ' · Unidad ' + unidad + ' · ' + titulo, ML, MT - 8);
     setDraw(C_RULE);
-    doc.setLineWidth(0.2);
-    doc.line(ML, MT - 7, PW - MR, MT - 7);
+    doc.setLineWidth(0.18);
+    doc.line(ML, MT - 5, PW - MR, MT - 5);
   }
 
-  function writeWrapped(text, x, startY, maxW, fontSize, fontStyle, color) {
+  // Escribe texto con wrap. Devuelve altura usada.
+  function writeWrapped(text, x, maxW, fontSize, fontStyle, color) {
     doc.setFontSize(fontSize);
     doc.setFont('helvetica', fontStyle || 'normal');
     setColor(color || C_BLACK);
     var lines = doc.splitTextToSize(text, maxW);
     var lineH = lh(fontSize);
-    var totalH = lines.length * lineH;
-    needSpace(totalH + 2);
+    needSpace(lines.length * lineH + 1);
     doc.text(lines, x, y);
-    y += totalH;
-    return totalH;
+    y += lines.length * lineH;
   }
 
-  // ── Page 1 Header ────────────────────────────────────────
-  if (opts.header) {
-    drawPageHeader();
-  }
+  // ── Encabezado página 1 ──────────────────────────────────
+  if (opts.header) drawPageHeader();
 
-  // ── TOC placeholder ─────────────────────────────────────
+  // ── TOC ──────────────────────────────────────────────────
   var h2Tokens = parsed.tokens.filter(function(t){ return t.type==='h2'; });
   if (opts.toc && h2Tokens.length > 0) {
-    // Title
-    doc.setFontSize(13);
+    doc.setFontSize(11);
     doc.setFont('helvetica','bold');
     setColor(C_DARK);
     doc.text('ÍNDICE', PW / 2, y, { align: 'center' });
-    y += lh(13) + 4;
-
+    y += lh(11) + 3;
     setDraw(C_RULE);
-    doc.setLineWidth(0.3);
+    doc.setLineWidth(0.25);
     doc.line(ML, y, PW - MR, y);
-    y += 4;
-
+    y += 3;
     h2Tokens.forEach(function(t, idx) {
       doc.setFontSize(FS_BODY);
       doc.setFont('helvetica','normal');
       setColor(C_ACCENT);
       doc.text((idx + 1) + '. ' + t.text, ML + 3, y);
-      y += lh(FS_BODY) + 1;
-      needSpace(lh(FS_BODY) + 2);
+      y += lh(FS_BODY) + 0.5;
+      needSpace(lh(FS_BODY) + 1);
     });
-
-    y += 6;
-    // New page after TOC
+    y += 4;
     addPage();
   }
 
-  // ── Render tokens ────────────────────────────────────────
+  // ── Renderizar tokens ─────────────────────────────────────
   var prevType = '';
 
   parsed.tokens.forEach(function(tok) {
     switch (tok.type) {
 
+      // ── H1: Arial Bold 12pt, centrado, con líneas ────────
       case 'h1': {
-        // Extra space before title
-        if (prevType && prevType !== 'blank') y += 6;
-        needSpace(lh(FS_H1) + 8);
-        // Title box — thin top line
+        if (prevType && prevType !== 'blank') y += 2;
+        needSpace(lh(FS_H1) + 6);
         setDraw(C_ACCENT);
-        doc.setLineWidth(0.5);
+        doc.setLineWidth(0.4);
         doc.line(ML, y - 1, PW - MR, y - 1);
-
         doc.setFontSize(FS_H1);
         doc.setFont('helvetica','bold');
         setColor(C_DARK);
         var h1lines = doc.splitTextToSize(tok.text.toUpperCase(), TW);
-        doc.text(h1lines, PW / 2, y + lh(FS_H1) - 1, { align: 'center' });
-        y += h1lines.length * lh(FS_H1) + 2;
-
-        // Bottom line
+        doc.text(h1lines, PW / 2, y + lh(FS_H1) - 0.5, { align: 'center' });
+        y += h1lines.length * lh(FS_H1) + 1;
         doc.line(ML, y, PW - MR, y);
-        y += 6;
+        y += 2;
         break;
       }
 
+      // ── H2: Arial Bold 10pt, con subrayado ───────────────
       case 'h2': {
-        y += 5;
-        needSpace(lh(FS_H2) + 10);
+        y += 2;
+        needSpace(lh(FS_H2) + 6);
         doc.setFontSize(FS_H2);
         doc.setFont('helvetica','bold');
         setColor(C_ACCENT);
         var h2lines = doc.splitTextToSize(tok.text, TW);
         doc.text(h2lines, ML, y);
-        y += h2lines.length * lh(FS_H2) + 1;
-        // Underline
+        y += h2lines.length * lh(FS_H2) + 0.5;
         setDraw(C_ACCENT);
-        doc.setLineWidth(0.35);
-        doc.line(ML, y, ML + Math.min(TW, tok.text.length * 2.5), y);
-        y += 4;
+        doc.setLineWidth(0.28);
+        doc.line(ML, y, ML + Math.min(TW, tok.text.length * 2.2), y);
+        y += 2;
         break;
       }
 
+      // ── H3: Arial Bold 10pt, barra izquierda ─────────────
       case 'h3': {
-        y += 3;
-        needSpace(lh(FS_H3) + 6);
-        // Left accent bar
+        y += 1.5;
+        needSpace(lh(FS_H3) + 4);
         doc.setFillColor(C_SUB[0], C_SUB[1], C_SUB[2]);
-        doc.rect(ML, y - lh(FS_H3) + 1, 2, lh(FS_H3), 'F');
+        doc.rect(ML, y - lh(FS_H3) + 0.5, 1.8, lh(FS_H3), 'F');
         doc.setFontSize(FS_H3);
         doc.setFont('helvetica','bold');
         setColor(C_SUB);
         var h3lines = doc.splitTextToSize(tok.text, TW - 5);
-        doc.text(h3lines, ML + 5, y);
-        y += h3lines.length * lh(FS_H3) + 2;
+        doc.text(h3lines, ML + 4, y);
+        y += h3lines.length * lh(FS_H3) + 1;
         break;
       }
 
+      // ── HR ────────────────────────────────────────────────
       case 'hr': {
-        y += 3;
-        needSpace(6);
+        y += 1.5;
+        needSpace(4);
         setDraw(C_RULE);
-        doc.setLineWidth(0.25);
-        doc.line(ML + 10, y, PW - MR - 10, y);
-        y += 5;
+        doc.setLineWidth(0.2);
+        doc.line(ML + 8, y, PW - MR - 8, y);
+        y += 2;
         break;
       }
 
+      // ── Fórmula ───────────────────────────────────────────
       case 'formula': {
-        y += 3;
-        needSpace(lh(FS_FORM) + 8);
-        // Formula box background
+        y += 1.5;
+        needSpace(lh(FS_FORM) + 5);
         doc.setFillColor(255, 252, 235);
-        doc.roundedRect(ML + 5, y - lh(FS_FORM), TW - 10, lh(FS_FORM) + 4, 2, 2, 'F');
+        doc.roundedRect(ML + 4, y - lh(FS_FORM), TW - 8, lh(FS_FORM) + 3, 1.5, 1.5, 'F');
         doc.setFontSize(FS_FORM);
         doc.setFont('courier','bold');
         setColor(C_FORM);
         doc.text(tok.text, PW / 2, y, { align: 'center' });
-        y += lh(FS_FORM) + 5;
+        y += lh(FS_FORM) + 2;
         break;
       }
 
+      // ── Lista nivel 1 ─────────────────────────────────────
       case 'li1': {
-        needSpace(lh(FS_LI) + 2);
-        // Bullet symbol
-        doc.setFontSize(FS_LI + 1);
+        needSpace(lh(FS_LI) + 1);
+        doc.setFontSize(FS_LI + 0.5);
         doc.setFont('helvetica','normal');
         setColor(C_ACCENT);
-        doc.text('•', ML + 5, y);
-        // Text
+        doc.text('•', ML + 4, y);
         doc.setFontSize(FS_LI);
         setColor(C_DARK);
-        var li1lines = doc.splitTextToSize(tok.text, TW - 10);
-        doc.text(li1lines, ML + 10, y);
-        y += li1lines.length * lh(FS_LI) + 1.5;
+        var li1lines = doc.splitTextToSize(tok.text, TW - 9);
+        doc.text(li1lines, ML + 9, y);
+        y += li1lines.length * lh(FS_LI) + 0.5;
         break;
       }
 
+      // ── Lista nivel 2 ─────────────────────────────────────
       case 'li2': {
-        needSpace(lh(FS_LI - 0.5) + 2);
+        needSpace(lh(FS_LI) + 1);
         doc.setFontSize(FS_LI - 0.5);
         doc.setFont('helvetica','normal');
         setColor(C_SUB);
-        doc.text('◦', ML + 11, y);
+        doc.text('◦', ML + 10, y);
         setColor(C_DIM);
-        var li2lines = doc.splitTextToSize(tok.text, TW - 16);
-        doc.text(li2lines, ML + 16, y);
-        y += li2lines.length * lh(FS_LI - 0.5) + 1;
+        var li2lines = doc.splitTextToSize(tok.text, TW - 15);
+        doc.text(li2lines, ML + 14, y);
+        y += li2lines.length * lh(FS_LI - 0.5) + 0.5;
         break;
       }
 
+      // ── Párrafo cuerpo: Arial 9pt, interlineado 1 ─────────
       case 'body': {
-        needSpace(lh(FS_BODY) + 1);
+        needSpace(lh(FS_BODY) + 0.5);
         doc.setFontSize(FS_BODY);
         doc.setFont('helvetica','normal');
         setColor(C_BLACK);
-        // Justified text
         var blines = doc.splitTextToSize(tok.text, TW);
-        // jsPDF text align justify requires individual lines
         for (var bi = 0; bi < blines.length; bi++) {
           var bl = blines[bi];
           var isLast = (bi === blines.length - 1);
@@ -892,41 +855,42 @@ function buildPDF(parsed, materia, unidad, titulo) {
             doc.text(bl, ML, y);
           }
           y += lh(FS_BODY);
-          needSpace(lh(FS_BODY) + 1);
+          needSpace(lh(FS_BODY) + 0.5);
         }
-        y += 1;
+        y += 0.5;
         break;
       }
 
+      // ── Línea en blanco ───────────────────────────────────
       case 'blank': {
-        y += lh(FS_BODY) * 0.6;
+        y += lh(FS_BODY) * 0.4;
         break;
       }
     }
     prevType = tok.type;
   });
 
-  // ── Last page footer / num ─────────────────────────────
+  // ── Última página: pie + número ──────────────────────────
   if (opts.nums) {
     doc.setFontSize(FS_HDR);
     doc.setFont('helvetica','normal');
     setColor(C_DIM);
-    doc.text(String(pageNum), PW / 2, PH - 10, { align: 'center' });
+    doc.text(String(pageNum), PW / 2, PH - 8, { align: 'center' });
   }
   if (opts.footer) {
     doc.setFontSize(FS_HDR - 0.5);
     doc.setFont('helvetica','italic');
     setColor(C_DIM);
-    doc.text(materia + ' · Unidad ' + unidad, ML, PH - 10);
-    doc.text(titulo, PW - MR, PH - 10, { align: 'right' });
+    doc.text(materia + ' · Unidad ' + unidad, ML, PH - 8);
+    doc.text(titulo, PW - MR, PH - 8, { align: 'right' });
   }
 
-  // ── Metadata ─────────────────────────────────────────────
+  // ── Metadatos ────────────────────────────────────────────
   doc.setProperties({
     title:   materia + ' - Unidad ' + unidad + ' - ' + titulo,
     subject: materia,
-    keywords: materia + ', Unidad ' + unidad + ', apuntes, psicologia',
-    creator: 'NeuroscanApuntes v1',
+    keywords: materia + ', Unidad ' + unidad + ', apuntes',
+    creator: 'NeuroscanApuntes v2',
     author:  materia
   });
 
@@ -966,7 +930,7 @@ function startProcess() {
       log('✓ ' + parsed.formulas + ' fórmulas detectadas', parsed.formulas > 0 ? 'ok' : '');
 
       setBar(40, 'Construyendo layout A4...');
-      log('→ Generando PDF con layout universitario...', 'act');
+      log('→ Generando PDF · Arial ' + bodyFontSize + 'pt · interlineado 1...', 'act');
 
       setTimeout(function() {
         try {
@@ -979,12 +943,11 @@ function startProcess() {
           setTimeout(function() {
             setBar(100, '¡Completado!');
 
-            // Stats
             document.getElementById('stP').textContent  = result.pages + ' página' + (result.pages !== 1 ? 's' : '');
             document.getElementById('stS').textContent  = parsed.sections + ' sección' + (parsed.sections !== 1 ? 'es' : '');
             document.getElementById('stW').textContent  = parsed.words.toLocaleString('es') + ' palabras';
             document.getElementById('stF').textContent  = parsed.formulas > 0 ? parsed.formulas + ' encontradas' : 'ninguna';
-            document.getElementById('stFnt').textContent = bodyFontSize + ' pt · helvetica';
+            document.getElementById('stFnt').textContent = bodyFontSize + ' pt · Arial/Helvetica · interlineado 1';
             document.getElementById('statsBox').classList.add('on');
 
             log('✓ "' + pdfFname + '" · ' + result.pages + ' págs.', 'ok');
@@ -1034,43 +997,33 @@ function resetAll() {
   hideErr();
 }
 
-
 // ═══════════════════════════════════════
 //  PROMPT MODAL & COPY
 // ═══════════════════════════════════════
 function openPrompt() {
-    document.getElementById('promptModal').style.display = 'flex';
+  document.getElementById('promptModal').style.display = 'flex';
 }
-
 function closePrompt() {
-    document.getElementById('promptModal').style.display = 'none';
+  document.getElementById('promptModal').style.display = 'none';
 }
-
 function copyPrompt() {
-    var copyText = document.getElementById("promptText");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); // Para móviles
-    navigator.clipboard.writeText(copyText.value);
-    
-    var btn = document.getElementById("copyBtn");
-    var originalText = btn.innerHTML;
-    btn.innerHTML = "✅ ¡COPIADO!";
-    btn.style.background = "var(--green)";
-    
-    setTimeout(function() {
-        btn.innerHTML = originalText;
-        btn.style.background = "linear-gradient(135deg,var(--cyan),var(--purple))";
-    }, 2000);
+  var copyText = document.getElementById("promptText");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(copyText.value);
+  var btn = document.getElementById("copyBtn");
+  var originalText = btn.innerHTML;
+  btn.innerHTML = "✅ ¡COPIADO!";
+  btn.style.background = "var(--green)";
+  setTimeout(function() {
+    btn.innerHTML = originalText;
+    btn.style.background = "linear-gradient(135deg,var(--purple),#5a189a)";
+  }, 2000);
 }
-
-// Cerrar modal si se hace clic fuera de la tarjeta
 window.onclick = function(event) {
-    var modal = document.getElementById('promptModal');
-    if (event.target == modal) {
-        closePrompt();
-    }
+  var modal = document.getElementById('promptModal');
+  if (event.target == modal) closePrompt();
 }
-
 </script>
 </body>
 </html>
