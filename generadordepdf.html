@@ -540,6 +540,32 @@ function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// ── Strip inline markers (para headings que ya son bold) ──────────
+function stripInline(s) {
+  return s.replace(/\*\*\*(.+?)\*\*\*/g,'$1')
+           .replace(/\*\*(.+?)\*\*/g,'$1')
+           .replace(/\*(.+?)\*/g,'$1');
+}
+
+// ── Parsea inline markdown en segmentos {text, bold, italic} ─────
+function parseInline(str) {
+  var segments = [];
+  // Match ***bold+italic***, **bold**, *italic*  — in that order
+  var re = /\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|\*(.+?)\*/g;
+  var last = 0, m;
+  while ((m = re.exec(str)) !== null) {
+    if (m.index > last) {
+      segments.push({ text: str.slice(last, m.index), bold: false, italic: false });
+    }
+    if (m[1] !== undefined)      segments.push({ text: m[1], bold: true,  italic: true  });
+    else if (m[2] !== undefined) segments.push({ text: m[2], bold: true,  italic: false });
+    else if (m[3] !== undefined) segments.push({ text: m[3], bold: false, italic: true  });
+    last = m.index + m[0].length;
+  }
+  if (last < str.length) segments.push({ text: str.slice(last), bold: false, italic: false });
+  return segments.length ? segments : [{ text: str, bold: false, italic: false }];
+}
+
 // ═══════════════════════════════════════
 //  LOG / PROGRESS
 // ═══════════════════════════════════════
@@ -571,14 +597,14 @@ function parseMarkdown(text) {
     var line = rawLine.trimEnd();
 
     if (/^# /.test(line)) {
-      tokens.push({ type: 'h1', text: line.slice(2).trim() });
+      tokens.push({ type: 'h1', text: stripInline(line.slice(2).trim()) });
       wordCount += line.split(/\s+/).length;
     } else if (/^## /.test(line)) {
-      tokens.push({ type: 'h2', text: line.slice(3).trim() });
+      tokens.push({ type: 'h2', text: stripInline(line.slice(3).trim()) });
       secCount++;
       wordCount += line.split(/\s+/).length;
     } else if (/^### /.test(line)) {
-      tokens.push({ type: 'h3', text: line.slice(4).trim() });
+      tokens.push({ type: 'h3', text: stripInline(line.slice(4).trim()) });
       wordCount += line.split(/\s+/).length;
     } else if (/^---+$/.test(line.trim())) {
       tokens.push({ type: 'hr' });
@@ -587,18 +613,21 @@ function parseMarkdown(text) {
       tokens.push({ type: 'formula', text: formula });
       formulaCount++;
     } else if (/^◦ /.test(line)) {
-      tokens.push({ type: 'li2', text: line.slice(2).trim() });
+      var t2 = line.slice(2).trim();
+      tokens.push({ type: 'li2', text: t2, segs: parseInline(t2) });
       wordCount += line.split(/\s+/).length;
     } else if (/^• /.test(line)) {
-      tokens.push({ type: 'li1', text: line.slice(2).trim() });
+      var t1 = line.slice(2).trim();
+      tokens.push({ type: 'li1', text: t1, segs: parseInline(t1) });
       wordCount += line.split(/\s+/).length;
     } else if (/^[-*] /.test(line)) {
-      tokens.push({ type: 'li1', text: line.slice(2).trim() });
+      var tl = line.slice(2).trim();
+      tokens.push({ type: 'li1', text: tl, segs: parseInline(tl) });
       wordCount += line.split(/\s+/).length;
     } else if (!line.trim()) {
       tokens.push({ type: 'blank' });
     } else {
-      tokens.push({ type: 'body', text: line });
+      tokens.push({ type: 'body', text: line, segs: parseInline(line) });
       wordCount += line.split(/\s+/).length;
     }
   });
@@ -700,6 +729,65 @@ function buildPDF(parsed, materia, unidad, titulo) {
     needSpace(lines.length * lineH + 1);
     doc.text(lines, x, y);
     y += lines.length * lineH;
+  }
+
+  // ── Renderiza segmentos inline (bold/italic) con word-wrap ──────
+  function renderInline(segs, startX, maxW, fs, baseColor, baseBold) {
+    // Convertir segmentos a lista de palabras con estilo
+    var words = [];
+    segs.forEach(function(seg) {
+      // Detectar espacios entre palabras del segmento
+      var parts = seg.text.split(/(\s+)/);
+      parts.forEach(function(p) {
+        if (p === '') return;
+        var isSpace = /^\s+$/.test(p);
+        words.push({ text: p, bold: seg.bold || baseBold, italic: seg.italic, isSpace: isSpace });
+      });
+    });
+
+    var lineH = lh(fs);
+
+    // Construir líneas respetando maxW
+    var lines = [];
+    var curr = [];
+    var currW = 0;
+
+    words.forEach(function(w) {
+      var style = (w.bold && w.italic) ? 'bolditalic' : w.bold ? 'bold' : w.italic ? 'italic' : 'normal';
+      doc.setFont('helvetica', style);
+      doc.setFontSize(fs);
+      var ww = doc.getTextWidth(w.text);
+
+      if (!w.isSpace && currW + ww > maxW && curr.length > 0) {
+        // Quitar espacio final de la línea si existe
+        if (curr.length && curr[curr.length-1].isSpace) curr.pop();
+        lines.push(curr);
+        curr = [{ text: w.text, bold: w.bold, italic: w.italic, isSpace: false, width: ww }];
+        currW = ww;
+      } else {
+        curr.push({ text: w.text, bold: w.bold, italic: w.italic, isSpace: w.isSpace, width: ww });
+        currW += ww;
+      }
+    });
+    if (curr.length) {
+      if (curr[curr.length-1].isSpace) curr.pop();
+      lines.push(curr);
+    }
+
+    lines.forEach(function(line) {
+      needSpace(lineH + 0.5);
+      var cx = startX;
+      line.forEach(function(w) {
+        var style = (w.bold && w.italic) ? 'bolditalic' : w.bold ? 'bold' : w.italic ? 'italic' : 'normal';
+        doc.setFont('helvetica', style);
+        doc.setFontSize(fs);
+        setColor(baseColor);
+        doc.text(w.text, cx, y);
+        cx += w.width;
+      });
+      y += lineH;
+    });
+    y += 0.3;
   }
 
   // ── Encabezado página 1 ──────────────────────────────────
@@ -817,11 +905,7 @@ function buildPDF(parsed, materia, unidad, titulo) {
         doc.setFont('helvetica','normal');
         setColor(C_ACCENT);
         doc.text('•', ML + 4, y);
-        doc.setFontSize(FS_LI);
-        setColor(C_DARK);
-        var li1lines = doc.splitTextToSize(tok.text, TW - 9);
-        doc.text(li1lines, ML + 9, y);
-        y += li1lines.length * lh(FS_LI) + 0.5;
+        renderInline(tok.segs || [{ text: tok.text, bold: false, italic: false }], ML + 9, TW - 9, FS_LI, C_DARK, false);
         break;
       }
 
@@ -832,32 +916,14 @@ function buildPDF(parsed, materia, unidad, titulo) {
         doc.setFont('helvetica','normal');
         setColor(C_SUB);
         doc.text('◦', ML + 10, y);
-        setColor(C_DIM);
-        var li2lines = doc.splitTextToSize(tok.text, TW - 15);
-        doc.text(li2lines, ML + 14, y);
-        y += li2lines.length * lh(FS_LI - 0.5) + 0.5;
+        renderInline(tok.segs || [{ text: tok.text, bold: false, italic: false }], ML + 14, TW - 15, FS_LI - 0.5, C_DIM, false);
         break;
       }
 
-      // ── Párrafo cuerpo: Arial 9pt, interlineado 1 ─────────
+      // ── Párrafo cuerpo: inline bold/italic ────────────────
       case 'body': {
         needSpace(lh(FS_BODY) + 0.5);
-        doc.setFontSize(FS_BODY);
-        doc.setFont('helvetica','normal');
-        setColor(C_BLACK);
-        var blines = doc.splitTextToSize(tok.text, TW);
-        for (var bi = 0; bi < blines.length; bi++) {
-          var bl = blines[bi];
-          var isLast = (bi === blines.length - 1);
-          if (!isLast && blines.length > 1) {
-            doc.text(bl, ML, y, { maxWidth: TW, align: 'justify' });
-          } else {
-            doc.text(bl, ML, y);
-          }
-          y += lh(FS_BODY);
-          needSpace(lh(FS_BODY) + 0.5);
-        }
-        y += 0.5;
+        renderInline(tok.segs || [{ text: tok.text, bold: false, italic: false }], ML, TW, FS_BODY, C_BLACK, false);
         break;
       }
 
